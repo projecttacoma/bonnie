@@ -3,7 +3,7 @@
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()
       @oldBonnieValueSetsByOid = bonnie.valueSetsByOid
-      bonnie.valueSetsByOid = getJSONFixture('/measure_data/core_measures/CMS160/value_sets.json')
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
 
       @measure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
       # Add some overlapping codes to the value sets to exercise the overlapping value sets feature
@@ -79,7 +79,7 @@
       jasmine.getJSONFixtures().clearCache()
       bonnie.measures = new Thorax.Collections.Measures()
       @universalValueSetsByOid = bonnie.valueSetsByOid
-      bonnie.valueSetsByOid = getJSONFixture('/measure_data/CQL/CMS107/value_sets.json')
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS107/value_sets.json')
       @cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS107/CMS107v6.json'), parse: true
       bonnie.measures.add @cqlMeasure
       @cqlPatients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS107/patients.json'), parse: true
