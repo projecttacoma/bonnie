@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'vcr_setup.rb'
 
-class CqlTest < ActiveSupport::TestCase    
+class CqlTest < ActiveSupport::TestCase
   setup do
     dump_database
     @cql_mat_export = File.new File.join('test', 'fixtures', 'cql_measure_exports', 'core_measures', 'CMS32v7_bonnie-fixtures@mitre.org_2018-01-11.zip')
@@ -54,7 +54,7 @@ class CqlTest < ActiveSupport::TestCase
 
       Measures::CqlLoader.extract_measures(@cql_mat_export, @user, measure_details, vsac_options, vsac_ticket_granting_ticket).each(&:save)
       assert_equal 1, CqlMeasure.count
-  
+
       measure = CqlMeasure.where({hqmf_set_id: '3FD13096-2C8F-40B5-9297-B714E8DE9133'}).first
       assert_equal '40280382-5FA6-FE85-015F-BB40A1CD0B95', measure['hqmf_id']
       assert_equal 'Median Time from ED Arrival to ED Departure for Discharged ED Patients', measure['title']
@@ -64,7 +64,7 @@ class CqlTest < ActiveSupport::TestCase
       measure.cql = nil
       measure.elm_annotations = nil
       measure.save
-      # Confirm measure model saved corectly.       
+      # Confirm measure model saved corectly.
       assert_nil measure.cql
       assert_nil measure.elm_annotations
 
@@ -73,12 +73,12 @@ class CqlTest < ActiveSupport::TestCase
       measure = CqlMeasure.where({hqmf_set_id: '3FD13096-2C8F-40B5-9297-B714E8DE9133'}).first
       # Confirm that measure title did not update.
       assert_equal measure.title, 'foo'
-      
+ 
       # Confirm that the CQL and ELM annotations were updated.
       assert_not_equal nil, measure.cql
       assert_not_equal nil, measure.elm_annotations
       measure.delete
-    end 
+    end
   end
 
   test 'rebuild elm using translation service' do
@@ -113,7 +113,7 @@ class CqlTest < ActiveSupport::TestCase
       # Run rake task on all cql measures
       Rake::Task['bonnie:cql:rebuild_elm'].execute
     end
-    
+
     measure = CqlMeasure.where({hqmf_set_id: '3FD13096-2C8F-40B5-9297-B714E8DE9133'}).first
     # Confirm that measure title did not update.
     assert_equal measure.title, 'No mat package'
