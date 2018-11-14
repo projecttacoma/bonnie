@@ -2,7 +2,7 @@ require 'test_helper'
 
 module ApiV1
   class MeasuresControllerTest < ActionController::TestCase
-    include Devise::TestHelpers
+    include Devise::Test::ControllerHelpers
 
     setup do
       @error_dir = File.join('log','load_errors')
