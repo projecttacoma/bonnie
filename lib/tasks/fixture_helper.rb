@@ -49,8 +49,6 @@ def insert_mongoid_ids(json)
       else
         insert_mongoid_ids(v)
       end
-    elsif %w[_id bundle_id user_id].include?(k)
-      json[k] = BSON::ObjectId.from_string(v)
     end
   end
 end
