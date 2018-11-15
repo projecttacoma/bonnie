@@ -1,3 +1,53 @@
+# TODO: remove once we get rid of PhantomJS:
+# Array.prototype.findIndex Polyfill
+# https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+# https://tc39.github.io/ecma262/#sec-array.prototype.findindex
+`if (!Array.prototype.findIndex) {
+  Object.defineProperty(Array.prototype, 'findIndex', {
+    value: function(predicate) {
+     // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw new TypeError('"this" is null or not defined');
+      }
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+
+      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+      var thisArg = arguments[1];
+
+      // 5. Let k be 0.
+      var k = 0;
+
+      // 6. Repeat, while k < len
+      while (k < len) {
+        // a. Let Pk be ! ToString(k).
+        // b. Let kValue be ? Get(O, Pk).
+        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+        // d. If testResult is true, return k.
+        var kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return k;
+        }
+        // e. Increase k by 1.
+        k++;
+      }
+
+      // 7. Return -1.
+      return -1;
+    },
+    configurable: true,
+    writable: true
+  });
+}`
+
 describe 'PatientBuilderView', ->
 
   beforeEach ->
@@ -8,6 +58,7 @@ describe 'PatientBuilderView', ->
     bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS134/value_sets.json')
     bonnie.measures.add @measure
     @patientBuilder = new Thorax.Views.PatientBuilder(model: @patient, measure: @measure, patients: @patients)
+    # TODO: don't rely on first() for this. What should the criteria be?
     @firstCriteria = @patientBuilder.model.get('source_data_criteria').first()
     # Normally the first criteria can't have a value (wrong type); for testing we allow it
     @firstCriteria.canHaveResult = -> true
@@ -185,6 +236,20 @@ describe 'PatientBuilderView', ->
 
     afterEach -> @patientBuilder.remove()
 
+  describe "adding codes to an encounter", ->
+    beforeEach ->
+      @patientBuilder.appendTo 'body'
+      @addCode = (codeSet, code, submit = true) ->
+        @patientBuilder.$('.codeset-control:first').val(codeSet).change()
+        $codelist = @patientBuilder.$('.codelist-control:first')
+        expect($codelist.children("[value=#{code}]")).toExist()
+        $codelist.val(code).change()
+
+    # FIXME Our test JSON doesn't yet support value sets very well... write these tests when we have a source of value sets independent of the measures
+    it "adds a code", ->
+
+    afterEach -> @patientBuilder.remove()
+
   describe "adding values to a criteria", ->
     beforeEach ->
       @patientBuilder.appendTo 'body'
@@ -196,6 +261,13 @@ describe 'PatientBuilderView', ->
       @addCodedValue = (codeListId, submit=true) ->
         @patientBuilder.$('select[name=type]:first').val('CD').change()
         @patientBuilder.$('select[name=code_list_id]').val(codeListId).change()
+        @patientBuilder.$('.value-formset .btn-primary:first').click() if submit
+      @addRatioValue= (numer, numer_units, denom, denom_units, submit=true) ->
+        @patientBuilder.$('select[name=type]:first').val('RT').change()
+        @patientBuilder.$('input[name=numerator_scalar]:first').val(numer).keyup()
+        @patientBuilder.$('input[name=numerator_units]:first').val(numer_units)
+        @patientBuilder.$('input[name=denominator_scalar]:first').val(denom).keyup()
+        @patientBuilder.$('input[name=denominator_units]:first').val(denom_units)
         @patientBuilder.$('.value-formset .btn-primary:first').click() if submit
 
     it "adds a scalar value", ->
@@ -214,6 +286,16 @@ describe 'PatientBuilderView', ->
       expect(@firstCriteria.get('value').first().get('type')).toEqual 'CD'
       expect(@firstCriteria.get('value').first().get('code_list_id')).toEqual '2.16.840.1.113883.3.464.1003.109.12.1016'
       expect(@firstCriteria.get('value').first().get('title')).toEqual 'Dialysis Education'
+
+    it "adds a ratio value", ->
+      expect(@firstCriteria.get('value').length).toEqual 0
+      @addRatioValue '1', 'mg', '8', 'g'
+      expect(@firstCriteria.get('value').length).toEqual 1
+      expect(@firstCriteria.get('value').first().get('type')).toEqual 'RT'
+      expect(@firstCriteria.get('value').first().get('numerator_scalar')).toEqual '1'
+      expect(@firstCriteria.get('value').first().get('numerator_units')).toEqual 'mg'
+      expect(@firstCriteria.get('value').first().get('denominator_scalar')).toEqual '8'
+      expect(@firstCriteria.get('value').first().get('denominator_units')).toEqual 'g'
 
     it "only allows for a single result", ->
       expect(@firstCriteria.get('value').length).toEqual 0
@@ -255,13 +337,12 @@ describe 'PatientBuilderView', ->
         @patientBuilder.$('select[name=type]:eq(1)').val('CD').change()
         @patientBuilder.$('select[name=code_list_id]').val(codeListId).change()
         @patientBuilder.$('.field-value-formset .btn-primary:first').click() if submit
-      @addRatioValue= (numer, numer_units, denom, denom_units, submit=true) ->
-        @patientBuilder.$('select[name=type]:first').val('RT').change()
-        @patientBuilder.$('input[name=numerator_scalar]:first').val(numer).keyup()
-        @patientBuilder.$('input[name=numerator_units]:first').val(numer_units)
-        @patientBuilder.$('input[name=denominator_scalar]:first').val(denom).keyup()
-        @patientBuilder.$('input[name=denominator_units]:first').val(denom_units)
-        @patientBuilder.$('.value-formset .btn-primary:first').click() if submit
+      @addIdFieldValue = (fieldType, id, system, submit=true) ->
+        @patientBuilder.$('select[name=key]').val(fieldType).change()
+        @patientBuilder.$('select[name=type]:eq(1)').val('ID').change()
+        @patientBuilder.$('input[name=root]').val(id).keyup()
+        @patientBuilder.$('input[name=extension]').val(system).keyup()
+        @patientBuilder.$('.field-value-formset .btn-primary:first').click() if submit
 
     it "adds a scalar field value", ->
       expect(@firstCriteria.get('field_values').length).toEqual 0
@@ -281,15 +362,14 @@ describe 'PatientBuilderView', ->
       expect(@firstCriteria.get('field_values').first().get('code_list_id')).toEqual '2.16.840.1.113883.3.464.1003.109.12.1016'
       expect(@firstCriteria.get('field_values').first().get('title')).toEqual 'Dialysis Education'
 
-    it "adds a ratio value", ->
-      expect(@firstCriteria.get('value').length).toEqual 0
-      @addRatioValue '1', 'mg', '8', 'g'
-      expect(@firstCriteria.get('value').length).toEqual 1
-      expect(@firstCriteria.get('value').first().get('type')).toEqual 'RT'
-      expect(@firstCriteria.get('value').first().get('numerator_scalar')).toEqual '1'
-      expect(@firstCriteria.get('value').first().get('numerator_units')).toEqual 'mg'
-      expect(@firstCriteria.get('value').first().get('denominator_scalar')).toEqual '8'
-      expect(@firstCriteria.get('value').first().get('denominator_units')).toEqual 'g'
+    it "adds an ID type field value", ->
+      expect(@firstCriteria.get('field_values').length).toEqual 0
+      @addIdFieldValue 'SOURCE', 'testId', 'testSystem'
+      expect(@firstCriteria.get('field_values').length).toEqual 1
+      expect(@firstCriteria.get('field_values').first().get('type')).toEqual 'ID'
+      expect(@firstCriteria.get('field_values').first().get('key')).toEqual 'SOURCE'
+      expect(@firstCriteria.get('field_values').first().get('root')).toEqual 'testId'
+      expect(@firstCriteria.get('field_values').first().get('extension')).toEqual 'testSystem'
 
     it "materializes the patient", ->
       expect(@patientBuilder.model.materialize).not.toHaveBeenCalled()
@@ -376,9 +456,9 @@ describe 'PatientBuilderView', ->
 
   describe "setting expected values for CV measure", ->
     beforeEach ->
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS32/CMS32v7.json'), parse: true
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS32/value_sets.json')
-      patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS32/patients.json'), parse: true
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS32/value_sets.json')
+      patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
       @patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
       @patientBuilder.appendTo 'body'
       @setPopulationVal = (population, value=0, save=true) ->
@@ -437,294 +517,28 @@ describe 'PatientBuilderView', ->
 
     afterEach -> @patientBuilder.remove()
 
-    describe "modifying living status", ->
-      beforeEach ->
-        @patientBuilder.appendTo 'body'
-        @addScalarFieldValue = (fieldType, input, units, submit=true) ->
-          @patientBuilder.$('select[name=key]').val(fieldType)
-          @patientBuilder.$('select[name=type]:eq(1)').val('PQ').change()
-          @patientBuilder.$('input[name=value]').val(input).keyup()
-          @patientBuilder.$('input[name=unit]').val(units)
-          @patientBuilder.$('.field-value-formset .btn-primary:first').click() if submit
-        @addCodedFieldValue = (fieldType, codeListId, submit=true) ->
-          @patientBuilder.$('select[name=key]').val(fieldType).change()
-          @patientBuilder.$('select[name=type]:eq(1)').val('CD').change()
-          @patientBuilder.$('select[name=code_list_id]').val(codeListId).change()
-          @patientBuilder.$('.value-formset .btn-primary:first').click() if submit
-        @addRatioValue= (numer, numer_units, denom, denom_units, submit=true) ->
-          @patientBuilder.$('select[name=type]:first').val('RT').change()
-          @patientBuilder.$('input[name=numerator_scalar]:first').val(numer).keyup()
-          @patientBuilder.$('input[name=numerator_units]:first').val(numer_units)
-          @patientBuilder.$('input[name=denominator_scalar]:first').val(denom).keyup()
-          @patientBuilder.$('input[name=denominator_units]:first').val(denom_units)
-          @patientBuilder.$('.value-formset .btn-primary:first').click() if submit
-
-      it "adds a scalar value", ->
-        expect(@firstCriteria.get('value').length).toEqual 0
-        @addScalarValue 1, 'mg'
-        expect(@firstCriteria.get('value').length).toEqual 1
-        expect(@firstCriteria.get('value').first().get('type')).toEqual 'PQ'
-        expect(@firstCriteria.get('value').first().get('value')).toEqual '1'
-        expect(@firstCriteria.get('value').first().get('unit')).toEqual 'mg'
-
-      it "adds a coded value", ->
-        expect(@firstCriteria.get('value').length).toEqual 0
-        @addCodedValue '2.16.840.1.113883.3.464.1003.101.12.1061'
-        expect(@firstCriteria.get('value').length).toEqual 1
-        expect(@firstCriteria.get('value').first().get('type')).toEqual 'CD'
-        expect(@firstCriteria.get('value').first().get('code_list_id')).toEqual '2.16.840.1.113883.3.464.1003.101.12.1061'
-        expect(@firstCriteria.get('value').first().get('title')).toEqual 'Ambulatory/ED Visit'
-
-      it "adds a ratio value", ->
-        expect(@firstCriteria.get('value').length).toEqual 0
-        @addRatioValue '1', 'mg', '8', 'g'
-        expect(@firstCriteria.get('value').length).toEqual 1
-        expect(@firstCriteria.get('value').first().get('type')).toEqual 'RT'
-        expect(@firstCriteria.get('value').first().get('numerator_scalar')).toEqual '1'
-        expect(@firstCriteria.get('value').first().get('numerator_units')).toEqual 'mg'
-        expect(@firstCriteria.get('value').first().get('denominator_scalar')).toEqual '8'
-        expect(@firstCriteria.get('value').first().get('denominator_units')).toEqual 'g'
-
-      it "only allows for a single result", ->
-        expect(@firstCriteria.get('value').length).toEqual 0
-        # Want the option to select a Result value to be visible
-        expect(@patientBuilder.$('.edit_value_view.hide')).not.toExist()
-        @addCodedValue '2.16.840.1.113883.3.464.1003.101.12.1061'
-        expect(@firstCriteria.get('value').length).toEqual 1
-        # Once a Result value has been added don't want to be able to add more
-        expect(@patientBuilder.$('.edit_value_view.hide')).toExist()
-
-      it "adds a scalar field value", ->
-        expect(@firstCriteria.get('field_values').length).toEqual 0
-        @addScalarFieldValue 'SOURCE', 1, 'unit'
-        expect(@firstCriteria.get('field_values').length).toEqual 1
-        expect(@firstCriteria.get('field_values').first().get('type')).toEqual 'PQ'
-        expect(@firstCriteria.get('field_values').first().get('key')).toEqual 'SOURCE'
-        expect(@firstCriteria.get('field_values').first().get('value')).toEqual '1'
-        expect(@firstCriteria.get('field_values').first().get('unit')).toEqual 'unit'
-
-      it "adds a coded field value", ->
-        expect(@firstCriteria.get('field_values').length).toEqual 0
-        @addCodedFieldValue 'REASON', '2.16.840.1.113883.3.464.1003.109.12.1016'
-        expect(@firstCriteria.get('field_values').length).toEqual 1
-        expect(@firstCriteria.get('field_values').first().get('type')).toEqual 'CD'
-        expect(@firstCriteria.get('field_values').first().get('key')).toEqual 'REASON'
-        expect(@firstCriteria.get('field_values').first().get('code_list_id')).toEqual '2.16.840.1.113883.3.464.1003.109.12.1016'
-        expect(@firstCriteria.get('field_values').first().get('title')).toEqual 'Dialysis Education'
-
-      it "materializes the patient", ->
-        expect(@patientBuilder.model.materialize).not.toHaveBeenCalled()
-        @addScalarFieldValue 'SOURCE', 1, 'unit'
-        expect(@patientBuilder.model.materialize).toHaveBeenCalled()
-        expect(@patientBuilder.model.materialize.calls.count()).toEqual 1
-        @addCodedFieldValue 'REASON', '2.16.840.1.113883.3.464.1003.109.12.1016'
-        expect(@patientBuilder.model.materialize.calls.count()).toEqual 2
-
-      it "disables input until form is filled out", ->
-        expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).toBeDisabled()
-        @addScalarFieldValue 'SOURCE', 1, 'unit', false
-        expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).not.toBeDisabled()
-        @addScalarFieldValue '', '', '', false
-        expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).toBeDisabled()
-
-    it "adds a scalar field value", ->
-      expect(@firstCriteria.get('field_values').length).toEqual 0
-      @addScalarFieldValue 'SOURCE', 1, 'unit'
-      expect(@firstCriteria.get('field_values').length).toEqual 1
-      expect(@firstCriteria.get('field_values').first().get('type')).toEqual 'PQ'
-      expect(@firstCriteria.get('field_values').first().get('key')).toEqual 'SOURCE'
-      expect(@firstCriteria.get('field_values').first().get('value')).toEqual '1'
-      expect(@firstCriteria.get('field_values').first().get('unit')).toEqual 'unit'
-
-    it "adds a coded field value", ->
-      expect(@firstCriteria.get('field_values').length).toEqual 0
-      @addCodedFieldValue 'SOURCE', '2.16.840.1.113883.3.464.1003.109.12.1016'
-      expect(@firstCriteria.get('field_values').length).toEqual 1
-      expect(@firstCriteria.get('field_values').first().get('type')).toEqual 'CD'
-      expect(@firstCriteria.get('field_values').first().get('key')).toEqual 'SOURCE'
-      expect(@firstCriteria.get('field_values').first().get('code_list_id')).toEqual '2.16.840.1.113883.3.464.1003.109.12.1016'
-      expect(@firstCriteria.get('field_values').first().get('title')).toEqual 'Dialysis Education'
-
-    it "adds a ratio value", ->
-      expect(@firstCriteria.get('value').length).toEqual 0
-      @addRatioValue '1', 'mg', '8', 'g'
-      expect(@firstCriteria.get('value').length).toEqual 1
-      expect(@firstCriteria.get('value').first().get('type')).toEqual 'RT'
-      expect(@firstCriteria.get('value').first().get('numerator_scalar')).toEqual '1'
-      expect(@firstCriteria.get('value').first().get('numerator_units')).toEqual 'mg'
-      expect(@firstCriteria.get('value').first().get('denominator_scalar')).toEqual '8'
-      expect(@firstCriteria.get('value').first().get('denominator_units')).toEqual 'g'
-
-    it "materializes the patient", ->
-      expect(@patientBuilder.model.materialize).not.toHaveBeenCalled()
-      @addScalarFieldValue 'SOURCE', 1, 'unit'
-      expect(@patientBuilder.model.materialize).toHaveBeenCalled()
-      expect(@patientBuilder.model.materialize.calls.count()).toEqual 1
-      @addCodedFieldValue 'SOURCE', '2.16.840.1.113883.3.464.1003.109.12.1016'
-      expect(@patientBuilder.model.materialize.calls.count()).toEqual 2
-
-    it "disables input until form is filled out", ->
-      expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).toBeDisabled()
-      @addScalarFieldValue 'SOURCE', 1, 'unit', false
-      expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).not.toBeDisabled()
-      @addScalarFieldValue '', '', '', false
-      expect(@patientBuilder.$('.field-value-formset .btn-primary:first')).toBeDisabled()
-
-    afterEach -> @patientBuilder.remove()
-
-  describe "setting expected values", ->
+  describe "modifying living status", ->
     beforeEach ->
       @patientBuilder.appendTo 'body'
-      @selectPopulationEV = (population, save=true) ->
-        @patientBuilder.$("input[type=checkbox][name=#{population}]:first").click()
-        @patientBuilder.$("button[data-call-method=save]").click() if save
 
-    it "auto unselects DENOM and IPP when IPP is unselected", ->
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 1
-      expect(expectedValues.get('DENOM')).toEqual 1
-      expect(expectedValues.get('NUMER')).toEqual 0
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
-
-    it "auto selects DENOM and IPP when NUMER is selected", ->
-      @selectPopulationEV('NUMER', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 1
-      expect(expectedValues.get('DENOM')).toEqual 1
-      expect(expectedValues.get('NUMER')).toEqual 1
-
-    it "auto unselects DENOM when IPP is unselected", ->
-      @selectPopulationEV('DENOM', false)
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
-
-    it "auto unselects DENOM and NUMER when IPP is unselected", ->
-      @selectPopulationEV('NUMER', false)
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
-
-    it "auto selects DENOM and IPP when NUMER is selected", ->
-      @selectPopulationEV('NUMER', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 1
-      expect(expectedValues.get('DENOM')).toEqual 1
-      expect(expectedValues.get('NUMER')).toEqual 1
-
-    it "auto unselects DENOM when IPP is unselected", ->
-      @selectPopulationEV('DENOM', false)
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
-
-    it "auto unselects DENOM and NUMER when IPP is unselected", ->
-      @selectPopulationEV('NUMER', false)
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
+    it "expires and revives patient correctly", ->
+      @patientBuilder.$('input[type=checkbox][name=expired]:first').click()
+      @patientBuilder.$(':input[name=deathdate]').val('01/02/1994')
+      @patientBuilder.$(':input[name=deathtime]').val('1:15 PM')
+      @patientBuilder.$("button[data-call-method=save]").click()
+      expect(@patientBuilder.model.get('expired')).toEqual true
+      expect(@patientBuilder.model.get('deathdate')).toEqual moment.utc('01/02/1994 1:15 PM', 'L LT').format('X')
+      @patientBuilder.$("button[data-call-method=removeDeathDate]").click()
+      @patientBuilder.$("button[data-call-method=save]").click()
+      expect(@patientBuilder.model.get('expired')).toEqual false
+      expect(@patientBuilder.model.get('deathdate')).toEqual null
 
     afterEach -> @patientBuilder.remove()
-
-  describe "setting expected values for CV measure", ->
-    beforeEach ->
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS32/CMS32v7.json'), parse: true
-      bonnie.valueSetsByOid = getJSONFixture('/measure_data/CQL/CMS32/value_sets.json')
-      patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS32/patients.json'), parse: true
-      @patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
-      @patientBuilder.appendTo 'body'
-      @setPopulationVal = (population, value=0, save=true) ->
-        @patientBuilder.$("input[type=number][name=#{population}]:first").val(value).change()
-        @patientBuilder.$("button[data-call-method=save]").click() if save
-
-    it "IPP removal removes membership of all populations in CV measures", ->
-      @setPopulationVal('IPP', 0, true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('MSRPOPL')).toEqual 0
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 0
-      expect(expectedValues.get('OBSERV')).toEqual undefined
-
-    it "MSRPOPLEX addition adds membership to all populations in CV measures", ->
-      # First set IPP to 0 to zero out all population membership
-      @setPopulationVal('IPP', 0, true)
-      @setPopulationVal('MSRPOPLEX', 4, true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 4
-      expect(expectedValues.get('MSRPOPL')).toEqual 4
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 4
-      # 4 MSRPOPLEX and 4 MSRPOPL means there should be no OBSERVs
-      expect(expectedValues.get('OBSERV')).toEqual undefined
-
-    it "MSRPOPLEX addition and removal adds and removes OBSERVs in CV measures", ->
-      # First set IPP to 0 to zero out all population membership
-      @setPopulationVal('IPP', 0, true)
-      @setPopulationVal('MSRPOPLEX', 3, true)
-      @setPopulationVal('MSRPOPL', 4, true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 4
-      expect(expectedValues.get('MSRPOPL')).toEqual 4
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 3
-      # 4 MSRPOPL and 3 MSRPOPLEX means there should be 1 OBSERVs
-      expect(expectedValues.get('OBSERV').length).toEqual 1
-      @setPopulationVal('MSRPOPL', 6, true)
-      expect(expectedValues.get('IPP')).toEqual 6
-      expect(expectedValues.get('MSRPOPL')).toEqual 6
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 3
-      # 6 MSRPOPL and 3 MSRPOPLEX means there should be 3 OBSERVs
-      expect(expectedValues.get('OBSERV').length).toEqual 3
-      # Should remove all observs
-      @setPopulationVal('MSRPOPLEX', 6, true)
-      expect(expectedValues.get('IPP')).toEqual 6
-      expect(expectedValues.get('MSRPOPL')).toEqual 6
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 6
-      # 6 MSRPOPLEX and 6 MSRPOPL means there should be no OBSERVs
-      expect(expectedValues.get('OBSERV')).toEqual undefined
-      # set IPP to 0, should zero out all populations
-      @setPopulationVal('IPP', 0, true)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('MSRPOPL')).toEqual 0
-      expect(expectedValues.get('MSRPOPLEX')).toEqual 0
-      expect(expectedValues.get('OBSERV')).toEqual undefined
-
-    afterEach -> @patientBuilder.remove()
-
-    describe "modifying living status", ->
-      beforeEach ->
-        @patientBuilder.appendTo 'body'
-
-      it "expires patient correctly", ->
-        @patientBuilder.$('input[type=checkbox][name=expired]:first').click()
-        @patientBuilder.$(':input[name=deathdate]').val('01/02/1994')
-        @patientBuilder.$(':input[name=deathtime]').val('1:15 PM')
-        @patientBuilder.$("button[data-call-method=save]").click()
-        expect(@patientBuilder.model.get('expired')).toEqual true
-        expect(@patientBuilder.model.get('deathdate')).toEqual moment.utc('01/02/1994 1:15 PM', 'L LT').format('X')
-
-      it "revives patient correctly", ->
-        @patientBuilder.$("button[data-call-method=removeDeathDate]").click()
-        @patientBuilder.$("button[data-call-method=save]").click()
-        expect(@patientBuilder.model.get('expired')).toEqual false
-        expect(@patientBuilder.model.get('deathdate')).toEqual null
-
-      afterEach -> @patientBuilder.remove()
 
   describe 'CQL', ->
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()
-      @cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS158/CMS158v6.json'), parse: true
+      @cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS347/CMS735v0.json'), parse: true
       # preserve atomicity
       @universalValueSetsByOid = bonnie.valueSetsByOid
       @bonnie_measures_old = bonnie.measures
@@ -736,8 +550,8 @@ describe 'PatientBuilderView', ->
       bonnie.measures = @bonnie_measures_old
 
     it "laboratory test performed should have custom view for components", ->
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS134/value_sets.json')
-      patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS134/patients.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS347/value_sets.json')
+      patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS347/patients.json'), parse: true
       patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: @cqlMeasure)
       dataCriteria = patientBuilder.model.get('source_data_criteria').models
       laboratoryTestIndex = dataCriteria.findIndex((m) ->  m.attributes.definition is 'laboratory_test')
@@ -761,15 +575,13 @@ describe 'PatientBuilderView', ->
       expect(editFieldValueView.$('label[for=referenceRangeHigh]').length).toEqual(0)
 
     it "EditCriteriaValueView does not have duplicated codes in dropdown", ->
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS134/value_sets.json')
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS134/CMS134v6.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS107/value_sets.json')
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS107/CMS107v6.json'), parse: true
       bonnie.measures.add(cqlMeasure, { parse: true });
-      patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS134/patients.json'), parse: true
+      patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS107/patients.json'), parse: true
       patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
-      dataCriteria = patientBuilder.model.get('source_data_criteria').models
-      laboratoryTestIndex = dataCriteria.findIndex((m) ->  m.attributes.definition is 'laboratory_test')
-      laboratoryTest = dataCriteria[laboratoryTestIndex]
-      editCriteriaView = new Thorax.Views.EditCriteriaView(model: laboratoryTest, measure: cqlMeasure)
+      dataCriteria = patientBuilder.model.get('source_data_criteria').first()
+      editCriteriaView = new Thorax.Views.EditCriteriaView(model: dataCriteria, measure: cqlMeasure)
       editFieldValueView = editCriteriaView.editFieldValueView
       codesInDropdown = {}
 
@@ -814,7 +626,7 @@ describe 'PatientBuilderView', ->
       # preserve atomicity
       @universalValueSetsByOid = bonnie.valueSetsByOid
       @bonnie_measures_old = bonnie.measures
-  
+
       bonnie.valueSetsByOid = getJSONFixture('measure_data/special_measures/CMS321/value_sets.json')
       bonnie.measures = new Thorax.Collections.Measures()
       @compositeMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/special_measures/CMS321/CMS321v0.json'), parse: true
@@ -830,7 +642,7 @@ describe 'PatientBuilderView', ->
     afterEach ->
       bonnie.valueSetsByOid = @universalValueSetsByOid
       bonnie.measures = @bonnie_measures_old
-  
+
     it "should display a warning that the patient is shared", ->
       patientBuilder = new Thorax.Views.PatientBuilder(model: @compositePatients.first(), measure: @components[0])
       patientBuilder.render()
