@@ -68,6 +68,7 @@ describe 'PatientBuilderView', ->
     @$el = @patientBuilder.$el
 
   it 'should not open patient builder for non existent measure', ->
+    # TODO: WARNING: missing value sets on this test
     spyOn(bonnie,'showPageNotFound')
     bonnie.showPageNotFound.calls.reset()
     bonnie.renderPatientBuilder('non_existant_hqmf_set_id', @patient.id)
@@ -595,6 +596,7 @@ describe 'PatientBuilderView', ->
       expect(codesInDropdown['Dead']).toBeDefined()
 
     it "EditCriteriaValueView allows for input field validation to happen on change event", ->
+      # TODO: WARNING: missing value set on this test
       bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
       cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
       bonnie.measures.add(cqlMeasure, { parse: true });
