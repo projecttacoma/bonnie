@@ -92,6 +92,13 @@ def associate_user_with_patients(user,patients)
   end
 end
 
+def associate_user_with_value_sets(user,value_sets)
+  value_sets.each do |vs|
+    vs.user = user
+    vs.save
+  end
+end
+
 def associate_measure_with_patients(measure,patients)
   patients.each do |p|
     p.measure_ids = [measure.hqmf_set_id]
