@@ -185,9 +185,9 @@ describe 'CqlLogicView', ->
       jasmine.getJSONFixtures().clearCache()
       @universalValueSetsByOid = bonnie.valueSetsByOid
       # TODO: update CQL/CMS146v6 path to CQL/CMS146 when cql-testing-overhaul is merged
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS146v6/value_sets.json')
-      @cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS146v6/CMS146v6.json'), parse: true
-      @patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS146v6/patients.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/special_measures/CMS146/value_sets.json')
+      @cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/special_measures/CMS146/CMS146v6.json'), parse: true
+      @patients = new Thorax.Collections.Patients getJSONFixture('records/special_measures/CMS146/patients.json'), parse: true
       @population = @cqlMeasure.get('populations').first()
       @populationLogicView = new Thorax.Views.CqlPopulationLogic(model: @cqlMeasure, population: @cqlMeasure.get('populations').first())
       @populationLogicView.render()

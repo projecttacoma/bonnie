@@ -157,10 +157,10 @@ describe 'cqlCalculator', ->
           expect(result2.get('statement_results').PD0329.IntervalWithTZOffsets.pretty).toEqual('INTERVAL: 08/01/2012 12:00 AM - 12/31/2012 12:00 AM')
 
         it 'for CMS32 correctly', ->
-          bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS32/value_sets.json')
-          measure3 = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS32/CMS721v0.json'), parse: true
-          patients3 = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS32/patients.json'), parse: true
-          bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS32/value_sets.json')
+          bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS32/value_sets.json')
+          measure3 = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS32/CMS721v0.json'), parse: true
+          patients3 = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
+          bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS32/value_sets.json')
           patient3 = patients3.models[0]
           result3 = @cql_calculator.calculate(measure3.get('populations').first(), patient3, {doPretty: true})
           expect(result3.get('statement_results').Test32['Measure Observation'].pretty).toEqual('FUNCTION')
