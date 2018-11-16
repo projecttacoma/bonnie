@@ -133,7 +133,7 @@ Teaspoon.configure do |config|
   # Note: Output files can be specified by using `"junit>/path/to/output.xml"`.
   #
   # Available: :dot, :clean, :documentation, :json, :junit, :pride, :rspec_html, :snowday, :swayze_or_oprah, :tap, :tap_y, :teamcity
-  #config.formatters = [:dot]
+  config.formatters = [:tap_y]
 
   # Specify if you want color output from the formatters.
   #config.color = true
