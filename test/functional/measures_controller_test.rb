@@ -201,6 +201,7 @@ include Devise::Test::ControllerHelpers
   end
 
   test "upload MAT with that cause value sets not found error" do
+    skip('Need to find a new package that causes value sets not found error')
     VCR.use_cassette("vsac_not_found") do
       # Ensure measure is not loaded to begin with
       measure = CqlMeasure.where({hqmf_set_id: "7B2A9277-43DA-4D99-9BEE-6AC271A07747"}).first
