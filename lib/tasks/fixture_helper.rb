@@ -16,7 +16,7 @@ def add_collection(collection)
     fixture_json = JSON.parse(File.read(json_fixture_file))
     next if fixture_json.empty?
     # Value_sets are arrays of objects, unlike measures etc, so we need to iterate in that case.
-    fixture_json = [fixture_json] unless fixture_json.kind_of? Array
+    fixture_json = [fixture_json] unless fixture_json.is_a? Array
     fixture_json.each do |fj|
       convert_times(fj)
       insert_mongoid_ids(fj)
@@ -50,7 +50,7 @@ def insert_mongoid_ids(json)
         insert_mongoid_ids(v)
       end
     elsif %w[_id bundle_id user_id].include?(k)
-      json[k] = BSON::ObjectId.from_string(v) if !v.nil?
+      json[k] = BSON::ObjectId.from_string(v) unless v.nil?
     end
   end
 end
