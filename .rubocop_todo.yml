@@ -231,7 +231,6 @@ Layout/LeadingCommentSpace:
     - 'lib/measures/patient_builder.rb'
     - 'lib/patient_export.rb'
     - 'lib/tasks/cql_testing.rake'
-    - 'spec/teaspoon_env.rb'
     - 'test/functional/patients_controller_test.rb'
 
 # Offense count: 7
