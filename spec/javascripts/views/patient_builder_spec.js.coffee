@@ -625,6 +625,22 @@ describe 'PatientBuilderView', ->
       # expect add button to be enabled
       expect(editFieldValueView.$('button[data-call-method=addValue]').prop('disabled')).toEqual(false)
 
+    it "missing value sets warning shown under test setup without clearing bonnie.measures", ->
+      # This is sort of a test for coverage sake more than the actual expected
+      # behavior, but can serve as an example of how to reproduce these
+      # conditions for future investigation
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
+      # If bonnie.measures = new Thorax.Collections.Measures() is called here,
+      # no WARNING: missing value set message will be shown
+      bonnie.measures.add(cqlMeasure, { parse: true })
+      patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS160/patients.json'), parse: true
+      patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
+      assessmentPerformed = patientBuilder.model.get('source_data_criteria').at(2)
+      spyOn(console, 'log')
+      editCriteriaView = new Thorax.Views.EditCriteriaView(model: assessmentPerformed, measure: cqlMeasure)
+      expect(console.log).toHaveBeenCalledWith('WARNING: missing value set')
+
   describe 'Composite Measure', ->
 
     beforeEach ->
