@@ -146,9 +146,7 @@ Teaspoon.configure do |config|
   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
     chromeOptions: { args: %w[headless disable-gpu window-size=1920,1440 no-sandbox] }
   )
-  config.driver_options = { client_driver: :chrome,
-                            desired_capabilities: capabilities,
-                            client.timeout: 180 }
+  config.driver_options = { client_driver: :chrome, desired_capabilities: capabilities }
 
   # Specify additional options for the driver.
   #

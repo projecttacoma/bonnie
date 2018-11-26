@@ -2,7 +2,7 @@ language: ruby
 cache:
   - bundler
   - node_modules
-sudo: false
+sudo: required
 addons:
   chrome: stable
 rvm:
