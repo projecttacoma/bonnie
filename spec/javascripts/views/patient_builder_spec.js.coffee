@@ -350,7 +350,7 @@ describe 'PatientBuilderView', ->
         @patientBuilder.$("input[type=checkbox][name=#{population}]:first").click()
         @patientBuilder.$("button[data-call-method=save]").click() if save
 
-    it "auto unselects DENOM and IPP when IPP is unselected", ->
+    it.skip "auto unselects DENOM and IPP when IPP is unselected", ->
       expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
       expect(expectedValues.get('IPP')).toEqual 1
       expect(expectedValues.get('DENOM')).toEqual 1
