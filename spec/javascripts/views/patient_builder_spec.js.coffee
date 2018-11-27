@@ -350,16 +350,16 @@ describe 'PatientBuilderView', ->
         @patientBuilder.$("input[type=checkbox][name=#{population}]:first").click()
         @patientBuilder.$("button[data-call-method=save]").click() if save
 
-    it.skip "auto unselects DENOM and IPP when IPP is unselected", ->
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 1
-      expect(expectedValues.get('DENOM')).toEqual 1
-      expect(expectedValues.get('NUMER')).toEqual 0
-      @selectPopulationEV('IPP', true)
-      expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
-      expect(expectedValues.get('IPP')).toEqual 0
-      expect(expectedValues.get('DENOM')).toEqual 0
-      expect(expectedValues.get('NUMER')).toEqual 0
+    # it "auto unselects DENOM and IPP when IPP is unselected", ->
+    #   expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
+    #   expect(expectedValues.get('IPP')).toEqual 1
+    #   expect(expectedValues.get('DENOM')).toEqual 1
+    #   expect(expectedValues.get('NUMER')).toEqual 0
+    #   @selectPopulationEV('IPP', true)
+    #   expectedValues = @patientBuilder.model.get('expected_values').findWhere(population_index: 0)
+    #   expect(expectedValues.get('IPP')).toEqual 0
+    #   expect(expectedValues.get('DENOM')).toEqual 0
+    #   expect(expectedValues.get('NUMER')).toEqual 0
 
     it "auto selects DENOM and IPP when NUMER is selected", ->
       @selectPopulationEV('NUMER', true)
