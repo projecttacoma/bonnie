@@ -122,10 +122,20 @@ Teaspoon.configure do |config|
   # Capybara Webkit:
   #    https://github.com/modeset/teaspoon/wiki/Using-Capybara-Webkit
   # config.driver = :phantomjs
+  
+  # Monkey patch read_timeout of Net::Http used in Selenium Webdriver
+  class Selenium::WebDriver::Remote::Http::Default
+    def initialize(open_timeout: nil, read_timeout: nil)
+      @open_timeout = open_timeout
+      @read_timeout = 60
+    end
+  end
 
   # Teaspoon doesn't allow you to pass client driver options to the Selenium WebDriver. This monkey patch
   # is a temporary fix until this PR is merged: https://github.com/jejacks0n/teaspoon/pull/519.
   require 'teaspoon/driver/selenium'
+
+
   Teaspoon::Driver::Selenium.class_eval do
     def run_specs(runner, url)
       driver = ::Selenium::WebDriver.for(driver_options[:client_driver], @options.except(:client_driver) || {})
