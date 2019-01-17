@@ -10,6 +10,7 @@ class MeasuresController < ApplicationController
     # TODO: Can we skip the elm if it's CQL?
     @measure = Measure.by_user(current_user).without(*skippable_fields).where(id: params[:id]).first
     @measure ||= CQM::Measure.where(user_id: current_user.id).without(*skippable_fields).where(id: params[:id]).first
+    @measure ||= CqlMeasure.where(user_id: current_user.id).without(*skippable_fields).where(id: params[:id]).first
     raise Mongoid::Errors::DocumentNotFound unless @measure
     if stale? last_modified: @measure.updated_at.try(:utc), etag: @measure.cache_key
       raw_json = @measure.as_json(except: skippable_fields)
@@ -27,14 +28,20 @@ class MeasuresController < ApplicationController
     # Caching of value sets is (temporarily?) disabled to correctly handle cases where users use multiple accounts
     # if stale? last_modified: Measure.by_user(current_user).max(:updated_at).try(:utc)
     if true
-      value_set_ids = CQM::Measure.where(user_id: current_user.id).only(:value_set_ids).pluck(:value_set_ids).flatten.uniq
-      value_sets = value_set_ids.map{ |vs_id| CQM::ValueSet.find(vs_id) }
+      ### FOR CQM Measures ###
+      #value_set_ids = CQM::Measure.where(user_id: current_user.id).only(:value_set_ids).pluck(:value_set_ids).flatten.uniq
+      #value_sets = value_set_ids.map{ |vs_id| CQM::ValueSet.find(vs_id) }
+      ########################
 
       # Not the cleanest code, but we get a many second performance improvement by going directly to Moped
       # (The two commented lines are functionally equivalent to the following three uncommented lines, if slower)
       # value_sets_by_oid = HealthDataStandards::SVS::ValueSet.in(oid: value_set_oids).index_by(&:oid)
       # @value_sets_by_oid_json = MultiJson.encode(value_sets_by_oid.as_json(except: [:_id, :code_system, :code_system_version]))
-  #    value_sets = Mongoid::Clients.default[HealthDataStandards::SVS::ValueSet.collection_name].find({oid: { '$in' => value_set_oids }, user_id: current_user.id}, {'concepts.code_system' => 0, 'concepts.code_system_version' => 0})
+      ### FOR OLD CQL MEASURES ###
+      value_set_oids = Measure.by_user(current_user).only(:value_set_oids).pluck(:value_set_oids).flatten.uniq
+      value_set_oids += CqlMeasure.by_user(current_user).only(:value_set_oids).pluck(:value_set_oids).flatten.uniq
+      value_sets = Mongoid::Clients.default[HealthDataStandards::SVS::ValueSet.collection_name].find({oid: { '$in' => value_set_oids }, user_id: current_user.id}, {'concepts.code_system' => 0, 'concepts.code_system_version' => 0})
+      ############################
       value_set_map = {}
       value_sets.each do |vs|
         if !value_set_map.key?(vs['oid'])
