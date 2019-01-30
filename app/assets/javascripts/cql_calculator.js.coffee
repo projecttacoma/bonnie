@@ -36,9 +36,11 @@
       # Necessary structure for the CQL (ELM) Execution Engine. Uses CQL_QDM Patient API to map Bonnie patients to correct format.
       patientSource = new PatientSource([patient])
 
+      cqm_measure = population.collection.parent
+
       # Grab start and end of Measurement Period
-      start = @getConvertedTime population.collection.parent.get('measure_period').low.value
-      end = @getConvertedTime population.collection.parent.get('measure_period').high.value
+      start = @getConvertedTime cqm_measure.get('measure_period').low.value
+      end = @getConvertedTime cqm_measure.get('measure_period').high.value
       start_cql = cql.DateTime.fromJSDate(start, 0) # No timezone offset for start
       end_cql = cql.DateTime.fromJSDate(end, 0) # No timezone offset for stop
 
@@ -49,16 +51,20 @@
       params = {"Measurement Period": new cql.Interval(start_cql, end_cql)}
 
       # Grab ELM JSON from measure, use clone so that the function added from observations does not get added over and over again
-      elm = _.clone(population.collection.parent.get('elm'))
-
-      # Find the main library (the library that is the "measure") and
-      # grab the version to pass into the execution engine
+      cql_libraries = _.clone(cqm_measure.get('cql_libraries'))
+     
       main_library_version = ''
       main_library_index = 0
-      for elm_library, index in elm
-        if elm_library['library']['identifier']['id'] == population.collection.parent.get('main_cql_library')
-          main_library_version = elm_library['library']['identifier']['version']
+
+      elm = []
+      for cql_library, index in cql_libraries
+        # Find the main library (the library that is the "measure") and
+        # grab the version to pass into the execution engine
+        if cql_library.is_main_library
+          main_library_version = cql_library.library_version
           main_library_index = index
+        # Grab just the elm of the cql_library        
+        elm.push(cql_library.elm)
 
       observations = population.collection.parent.get('observations')
       observation_defs = []
@@ -81,10 +87,10 @@
       elm = @setValueSetVersionsToUndefined(elm)
 
       # Grab the correct version of value sets to pass into the exectuion engine.
-      measure_value_sets = @valueSetsForCodeService(population.collection.parent.get('value_set_oid_version_objects'), population.collection.parent.get('hqmf_set_id'))
+      measure_value_sets = @valueSetsForCodeService(bonnie.valueSetsByOid[cqm_measure.id], cqm_measure.get('hqmf_set_id'))
 
       # Calculate results for each CQL statement
-      results = executeSimpleELM(elm, patientSource, measure_value_sets, population.collection.parent.get('main_cql_library'), main_library_version, executionDateTime, params)
+      results = executeSimpleELM(elm, patientSource, measure_value_sets, cqm_measure.get('main_cql_library'), main_library_version, executionDateTime, params)
 
       # Parse CQL statement results into population values
       [population_results, episode_results] = @createPopulationValues population, results, patient, observation_defs
@@ -112,7 +118,7 @@
     
         result.set {'population_relevance': population_relevance }
         # Add 'statement_relevance', 'statement_results' and 'clause_results' generated in the CQLResultsHelpers class.
-        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, population.collection.parent, population) }
+        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, population.collection.parent, cqm_measure.get('population_sets')[0]) }
         result.set CQLResultsHelpers.buildStatementAndClauseResults(population.collection.parent, results.localIdPatientResultsMap[patient['id']], result.get('statement_relevance'), !!options['doPretty'])
 
         result.set {'patient_id': patient['id']} # Add patient_id to result in order to delete patient from population_calculation_view
@@ -239,30 +245,19 @@
   ###
   createPatientPopulationValues: (population, results, patient, observation_defs) ->
     population_results = {}
-    # Grab the mapping between populations and CQL statements
-    cql_map = population.collection.parent.get('populations_cql_map')
     # Grab the correct expected for this population
     populationIndex = population.get('index')
     measureId = population.collection.parent.get('hqmf_set_id')
     expected = patient.get('expected_values').findWhere(measure_id: measureId, population_index: populationIndex)
     # Loop over all population codes ("IPP", "DENOM", etc.)
     for popCode in Thorax.Models.Measure.allPopulationCodes
-      if cql_map[popCode]
-        # This code is supporting measures that were uploaded 
-        # before the parser returned multiple populations in an array.
-        # TODO: Remove this check when we move over to production.
-        if _.isString(cql_map[popCode])
-          defined_pops = [cql_map[popCode]]
-        else
-          defined_pops = cql_map[popCode]
-
-        popIndex = population.getPopIndexFromPopName(popCode)
-        cql_population = defined_pops[popIndex]
+      if true
         # Is there a patient result for this population? and does this populationCriteria contain the population
         # We need to check if the populationCriteria contains the population so that a STRAT is not set to zero if there is not a STRAT in the populationCriteria
         if population.get(popCode)?
           # Grab CQL result value and adjust for Bonnie
-          value = results['patientResults'][patient.id][cql_population]
+          # TODO Handle mutliple population sets
+          value = results['patientResults'][patient.id][population.collection.parent.get('population_sets')[0][popCode]]
           if Array.isArray(value) and value.length > 0
             population_results[popCode] = value.length
           else if typeof value is 'boolean' and value
@@ -515,12 +510,11 @@
     if !bonnie.valueSetsByOidCached[hqmf_set_id]
       valueSets = {}
       for value_set in value_set_oid_version_objects
-        specific_value_set = bonnie.valueSetsByOid[value_set['oid']][value_set['version']]
-        continue unless specific_value_set.concepts
-        valueSets[specific_value_set['oid']] ||= {}
-        valueSets[specific_value_set['oid']][specific_value_set['version']] ||= []
-        for concept in specific_value_set.concepts
-          valueSets[specific_value_set['oid']][specific_value_set['version']].push code: concept.code, system: concept.code_system_name, version: specific_value_set['version']
+        continue unless value_set.concepts
+        valueSets[value_set['oid']] ||= {}
+        valueSets[value_set['oid']][value_set['version']] ||= []
+        for concept in value_set.concepts
+          valueSets[value_set['oid']][value_set['version']].push code: concept.code, system: concept.code_system_name, version: value_set['version']
       bonnie.valueSetsByOidCached[hqmf_set_id] = valueSets
     bonnie.valueSetsByOidCached[hqmf_set_id]
 

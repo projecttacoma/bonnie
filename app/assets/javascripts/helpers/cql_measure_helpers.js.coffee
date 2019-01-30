@@ -12,9 +12,9 @@ class CQLMeasureHelpers
   ###
   @buildDefineToFullStatement: (measure) ->
     ret = {}
-    for lib of measure.get("elm_annotations")
+    for lib of measure.get("cql_libraries")
       lib_statements = {}
-      for statement in measure.get("elm_annotations")[lib].statements
+      for statement in lib.elm_annotations.statements
         lib_statements[statement.define_name] = @_parseAnnotationTree(statement.children)
       ret[lib] = lib_statements
     return ret
@@ -54,10 +54,10 @@ class CQLMeasureHelpers
     # find the library and statement in the elm.
     library = null
     statement = null
-    for lib in measure.get('elm')
-      if lib.library.identifier.id == libraryName
+    for lib in measure.get('cql_libraries')
+      if lib.library_name == libraryName
         library = lib
-    for curStatement in library.library.statements.def
+    for curStatement in library.elm.library.statements.def
       if curStatement.name == statementName
         statement = curStatement
 
@@ -273,11 +273,12 @@ class CQLMeasureHelpers
     # create a population relevance map where every population is true.
     populationRelevance = {}
     for popCode in Thorax.Models.Measure.allPopulationCodes
-      if populationSet.has(popCode)
-        if popCode == 'OBSERV'
-          populationRelevance['values'] = true
-        else
-          populationRelevance[popCode] = true
+      # TODO: Look into Observ attributes
+      # if popCode == 'OBSERV' 
+      #   populationRelevance['values'] = true
+      
+      if populationSet.get('populations')[popCode]
+        populationRelevance[popCode] = true
 
     # builds and returns this statement relevance map.
     return CQLResultsHelpers.buildStatementRelevanceMap(populationRelevance, measure, populationSet)
@@ -290,14 +291,10 @@ class CQLMeasureHelpers
   # @param {string} statementName - The statement name to search for.
   # @return {boolean} If the statement is a function or not.
   ###
-  @isStatementFunction: (measure, libraryName, statementName) ->
+  @isStatementFunction: (measure, library, statementName) ->
     # find the library and statement in the elm.
-    library = null
     statement = null
-    for lib in measure.get('elm')
-      if lib.library.identifier.id == libraryName
-        library = lib
-    for curStatement in library.library.statements.def
+    for curStatement in library.elm.library.statements.def
       if curStatement.name == statementName
         statement = curStatement
 

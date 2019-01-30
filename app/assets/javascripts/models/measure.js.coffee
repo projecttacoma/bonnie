@@ -11,19 +11,25 @@ class Thorax.Models.Measure extends Thorax.Model
     @_localIdCache = {}
   parse: (attrs) ->
     alphabet = 'abcdefghijklmnopqrstuvwxyz' # for population sub-ids
-    populations = new Thorax.Collections.Population [], parent: this
-    for population, index in attrs.populations
-      population.sub_id = alphabet[index]
-      population.index = index
-      delete population.id
+    populationSets = new Thorax.Collections.PopulationSets [], parent: this
+    # TODO Need to investigate this further. Populations here meaan "Population Sets"
+#    for population of attrs.population_criteria
+ #     population.sub_id = alphabet
+ #     population.index = index
+ #     delete population.id
       # copy population criteria data to population
-      for code in @constructor.allPopulationCodes
-        if populationCriteriaKey = population[code]
+#      for code in @constructor.allPopulationCodes
+#        if populationCriteriaKey in attrs.population_criteria
           # preserve the original population code for specifics rationale
-          population[code] = _(code: population[code]).extend(attrs.population_criteria[populationCriteriaKey])
-      populations.add new Thorax.Models.Population(population)
-    attrs.populations = populations
-    attrs.displayedPopulation = populations.first()
+#          population[code] = _(code: population).extend(attrs.population_criteria[population])
+
+    # population = {}
+    # for pop_code, population_value of attrs.population_criteria
+    #   population[pop_code] = population_value
+    for popSet in attrs.population_sets
+      populationSets.add new Thorax.Models.PopulationSet(popSet)
+    attrs.populations = populationSets
+    attrs.displayedPopulation = populationSets.first()
 
     # ignoring versions for diplay names
     oid_display_name_map = {}
@@ -50,7 +56,7 @@ class Thorax.Models.Measure extends Thorax.Model
 
     attrs.source_data_criteria = new Thorax.Collections.MeasureDataCriteria _(attrs.source_data_criteria).values(), parent: this
     attrs.source_data_criteria.each (criteria) ->
-      # Apply value set display name if one exists for this criteria
+      # Apply value set display name if one exists for this criteriaf
       if !criteria.get('variable') && oid_display_name_map[criteria.get('code_list_id')]?
         # For communication criteria we want to include the direction, which is separated from the type with a colon
         if criteria.get('type') == 'communications'
@@ -64,15 +70,7 @@ class Thorax.Models.Measure extends Thorax.Model
   populationCriteria: -> _.intersection(Thorax.Models.Measure.allPopulationCodes, _(@get('population_criteria')).map (p) -> p.type)
 
   valueSets: ->
-    unless @cachedValueSets
-      matchingSets = []
-      for oid_version in @get('value_set_oid_version_objects')
-        if bonnie.valueSetsByOid[oid_version.oid]
-          matchingSets.push(bonnie.valueSetsByOid[oid_version.oid][oid_version.version])
-      @cachedValueSets = new Thorax.Collection(matchingSets, comparator: (vs) ->
-        console.log('WARNING: missing value set') if !vs.get('display_name') && console?
-        vs.get('display_name')?.toLowerCase())
-    @cachedValueSets
+    bonnie.valueSetsByOid[@get('id')]
 
   hasCode: (code, code_system) ->
     @valueSets().any (vs) ->
@@ -173,7 +171,7 @@ class Thorax.Collections.Measures extends Thorax.Collection
         else
           return titleComparison
   populations: ->
-    populations = new Thorax.Collections.Population
+    populations = new Thorax.Collections.PopulationSets
     @each (m) -> m.get('populations').each (p) -> populations.add(p)
     populations
 

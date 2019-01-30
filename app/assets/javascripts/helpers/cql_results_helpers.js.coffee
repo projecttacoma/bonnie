@@ -55,26 +55,24 @@ class CQLResultsHelpers
   @buildStatementRelevanceMap: (populationRelevance, measure, populationSet) ->
     # build map defaulting to not applicable (NA) using cql_statement_dependencies structure
     statementRelevance = {}
-    for lib, statements of measure.get('cql_statement_dependencies')
-      statementRelevance[lib] = {}
-      for statementName of statements
-        statementRelevance[lib][statementName] = "NA"
+    for library in measure.get('cql_libraries')
+      for statement in library.statement_dependencies
+        statementRelevance[library.library_name] = {}
+        statementRelevance[library.library_name].statement_name = "NA"
 
     if measure.get('calculate_sdes') && populationSet.get('supplemental_data_elements')
       for statement in populationSet.get('supplemental_data_elements')
         # Mark all Supplemental Data Elements as relevant
-        @_markStatementRelevant(measure.get('cql_statement_dependencies'), statementRelevance, measure.get('main_cql_library'), statement, "TRUE")
+        @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), statement.statement_name, "TRUE")
 
     for population, relevance of populationRelevance
       # If the population is values, that means we need to mark relevance for the OBSERVs
       if (population == 'values')
         for observation in measure.get('observations')
-          @_markStatementRelevant(measure.get('cql_statement_dependencies'), statementRelevance, measure.get('main_cql_library'), observation.function_name, relevance)
+          @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), observation.observation_function.statement_name, relevance)
       else
-        populationIndex = populationSet.getPopIndexFromPopName(population)
-        relevantStatement = measure.get('populations_cql_map')[population][populationIndex]
-        @_markStatementRelevant(measure.get('cql_statement_dependencies'), statementRelevance, measure.get('main_cql_library'), relevantStatement, relevance)
-
+        relevantStatement = populationSet.get('populations')[population].statement_name
+        @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), relevantStatement, relevance)
     return statementRelevance
 
   ###*
@@ -94,8 +92,22 @@ class CQLResultsHelpers
     # only mark the statement if it is currently 'NA' or 'FALSE'. Otherwise it already has been marked 'TRUE'
     if statementRelevance[libraryName][statementName] == 'NA' || statementRelevance[libraryName][statementName] == 'FALSE'
       statementRelevance[libraryName][statementName] = if relevant then 'TRUE' else 'FALSE'
-      for dependentStatement in cql_statement_dependencies[libraryName][statementName]
-        @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
+
+      library = (lib for lib in cql_statement_dependencies when lib.library_name is libraryName)
+      statement = (stat for stat in library.statement_dependencies when stat.statement_name is statementName)
+      if !statement.statement_referendes
+        return []
+      
+      return statement.statement_references.map (dependentStatement) ->
+        this._markStatementRelevant(
+          cql_statement_dependencies,
+          statementRelevance,
+          dependentStatement.library_name,
+          dependentStatement.statement_name,
+          relevant
+        )
+  #    for dependentStatement in cql_statement_dependencies[libraryName][statementName]
+  #      @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
 
   ###*
   # Builds the result structures for the statements and the clauses. These are named `statement_results` and
