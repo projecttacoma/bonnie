@@ -25,6 +25,26 @@ GIT
       zip-zip (~> 0.3)
 
 GIT
+  remote: https://github.com/projecttacoma/cqm-converter
+  revision: bc3885c3789bc316428bd47ba2c828c134e166ab
+  branch: master
+  specs:
+    cqm-converter (1.0.3)
+      activesupport
+      coffee-script
+      execjs
+      health-data-standards (>= 4.3.2)
+      momentjs-rails
+      sprockets
+
+GIT
+  remote: https://github.com/projecttacoma/cqm-models
+  revision: 3b916105ff7f38956cd2fff695cecc73cc3a36fe
+  branch: master
+  specs:
+    cqm-models (1.0.2)
+
+GIT
   remote: https://github.com/randym/axlsx
   revision: c8ac844572b25fda358cc01d2104720c4c42f450
   branch: master
@@ -137,15 +157,6 @@ GEM
       coffee-rails (~> 4.1)
       rails (>= 4.2, < 6.0)
       sprockets-rails (~> 2.3)
-    cqm-converter (1.0.3)
-      activesupport
-      coffee-script
-      cqm-models (>= 1.0.2)
-      execjs
-      health-data-standards (>= 4.3.2)
-      momentjs-rails
-      sprockets
-    cqm-models (1.0.2)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
@@ -450,7 +461,8 @@ DEPENDENCIES
   coffee-rails
   colorize
   cql_qdm_patientapi (~> 1.3.1)
-  cqm-converter (~> 1.0.3)
+  cqm-converter!
+  cqm-models!
   devise
   doorkeeper (~> 4.4.0)
   doorkeeper-mongodb (~> 4.1.0)
