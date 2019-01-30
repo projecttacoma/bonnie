@@ -4,8 +4,8 @@ require './app/helpers/patient_helper'
 class PatientHelperTest < ActionView::TestCase
 
   test 'No Patients Sent To convert_patient_models' do
-    qdm_records = PatientHelper.convert_patient_models([])
-    assert_equal [[], []], qdm_records
+    cqm_records = PatientHelper.convert_patient_models([])
+    assert_equal [[], []], cqm_records
   end
 
   test 'Using core_measures set, Correct Number Of Patients Recieved From convert_patient_models with one failed patient' do
@@ -21,10 +21,10 @@ class PatientHelperTest < ActionView::TestCase
     hds_records = Record.all
     # make sure we have a total of 13 records and run conversion
     assert_equal 13, hds_records.count
-    qdm_records, failed_records = PatientHelper.convert_patient_models(hds_records)
+    cqm_records, failed_records = PatientHelper.convert_patient_models(hds_records)
 
     # 12 of the 13 patient are expected to convert without error
-    assert_equal 12, qdm_records.count
+    assert_equal 12, cqm_records.count
 
     # Pass Numer from CMS134v6 has a component with a unit "cc". This is not valid UCUM so it will show up in the list of failed records.
     assert_equal 1, failed_records.count
@@ -42,10 +42,10 @@ class PatientHelperTest < ActionView::TestCase
     hds_records = Record.all
     # make sure we have a total of 7 records and run converson
     assert_equal 7, hds_records.count
-    qdm_records, failed_records = PatientHelper.convert_patient_models(hds_records)
+    cqm_records, failed_records = PatientHelper.convert_patient_models(hds_records)
 
     # expect all 7 to convert without issue
-    assert_equal 7, qdm_records.count
+    assert_equal 7, cqm_records.count
 
     # expect there to be no failed records
     assert_empty failed_records
