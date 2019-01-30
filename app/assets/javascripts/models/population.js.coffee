@@ -1,4 +1,4 @@
-class Thorax.Models.Population extends Thorax.Model
+class Thorax.Models.PopulationSet extends Thorax.Model
 
   index: -> @collection.indexOf(this)
 
@@ -89,8 +89,8 @@ class Thorax.Models.Population extends Thorax.Model
           occurrences = occurrences.concat @getDataCriteriaKeys(dataCriteria,specificsOnly)
     return occurrences
 
-class Thorax.Collections.Population extends Thorax.Collection
-  model: Thorax.Models.Population
+class Thorax.Collections.PopulationSets extends Thorax.Collection
+  model: Thorax.Models.PopulationSet
   initialize: (models, options) -> @parent = options?.parent
   whenDifferencesComputed: (callback) ->
     @each (population) => population.differencesFromExpected().once 'complete', => callback(@) if @differencesComputed()

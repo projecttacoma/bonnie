@@ -1,7 +1,7 @@
 class Thorax.Views.MeasureRibbon extends Thorax.CollectionView
   className: 'measure-ribbon'
   initialize: ->
-    @collection = new Thorax.Collections.Population bonnie.measures.chain().map((m) -> m.get('populations').models).flatten().value()
+    @collection = new Thorax.Collections.PopulationSets bonnie.measures.chain().map((m) -> m.get('populations').models).flatten().value()
     @itemView = (item) => new Thorax.Views.MeasureRibbonCell
       patient: @model
       population: item.model
