@@ -22,13 +22,14 @@ namespace :bonnie do
       record_file_path = File.join(fixtures_path, 'cqm_records', args[:path])
 
       user = User.find_by email: args[:user_email]
-      measure = get_cqm_measure(user, args[:cms_hqmf], args[:measure_id])
-      records = Record.by_user_and_hqmf_set_id(user, measure.hqmf_set_id)
+      measure = get_cql_measure(user, args[:cms_hqmf], args[:measure_id])
+      cqm_measure = CQM::Converter::BonnieMeasure.to_cqm(measure)
+      records = Record.by_user_and_hqmf_set_id(user, cqm_measure.hqmf_set_id)
       if (args[:patient_first_name].present? && args[:patient_last_name].present?)
         records = records.select { |r| r.first == args[:patient_first_name] && r.last == args[:patient_last_name] }
       end
 
-      fixture_exporter = FrontendFixtureExporter.new(user, measure: measure, records: records)
+      fixture_exporter = FrontendFixtureExporter.new(user, measure: cqm_measure, records: records)
       fixture_exporter.export_measure_and_any_components(measure_file_path)
       fixture_exporter.export_value_sets(measure_file_path)
       fixture_exporter.export_records(record_file_path)

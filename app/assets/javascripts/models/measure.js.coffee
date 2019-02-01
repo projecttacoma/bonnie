@@ -12,28 +12,23 @@ class Thorax.Models.Measure extends Thorax.Model
   parse: (attrs) ->
     alphabet = 'abcdefghijklmnopqrstuvwxyz' # for population sub-ids
     populationSets = new Thorax.Collections.PopulationSets [], parent: this
-    # TODO Need to investigate this further. Populations here meaan "Population Sets"
-#    for population of attrs.population_criteria
- #     population.sub_id = alphabet
- #     population.index = index
- #     delete population.id
-      # copy population criteria data to population
-#      for code in @constructor.allPopulationCodes
-#        if populationCriteriaKey in attrs.population_criteria
-          # preserve the original population code for specifics rationale
-#          population[code] = _(code: population).extend(attrs.population_criteria[population])
 
-    # population = {}
-    # for pop_code, population_value of attrs.population_criteria
-    #   population[pop_code] = population_value
-    for popSet in attrs.population_sets
-      populationSets.add new Thorax.Models.PopulationSet(popSet)
+    for populationSet, index of attrs.population_sets
+      populationSet.sub_id = alphabet[index]
+      populationSet.index = index
+      delete populationSet._id
+      # copy population criteria data to population
+      for popCode of populationSet.populations
+        # preserve the original population code for specifics rationale
+        population[popCode] = _(code: popCode).extend(attrs.population_criteria[popCode])
+      populationSets.add new Thorax.Models.PopulationSet(populationSet)
+
     attrs.populations = populationSets
     attrs.displayedPopulation = populationSets.first()
 
     # ignoring versions for diplay names
     oid_display_name_map = {}
-    for oid, versions of bonnie.valueSetsByOid
+    for oid, versions of bonnie.valueSetsByOid[attrs.hqmf_set_id]
       for version, vs of versions
         oid_display_name_map[oid] = vs.display_name if vs?.display_name
 
@@ -56,7 +51,7 @@ class Thorax.Models.Measure extends Thorax.Model
 
     attrs.source_data_criteria = new Thorax.Collections.MeasureDataCriteria _(attrs.source_data_criteria).values(), parent: this
     attrs.source_data_criteria.each (criteria) ->
-      # Apply value set display name if one exists for this criteriaf
+      # Apply value set display name if one exists for this criteria
       if !criteria.get('variable') && oid_display_name_map[criteria.get('code_list_id')]?
         # For communication criteria we want to include the direction, which is separated from the type with a colon
         if criteria.get('type') == 'communications'
