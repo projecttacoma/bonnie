@@ -29,12 +29,12 @@ class MeasuresController < ApplicationController
     # if stale? last_modified: Measure.by_user(current_user).max(:updated_at).try(:utc)
     if true
       ### FOR CQM Measures ###
-      
-      cqm_measures = CQM::Measure.where(user_id: current_user.id)  
+
+      cqm_measures = CQM::Measure.where(user_id: current_user.id)
       # Measure {measure_id: [value_sets]}
       @value_sets_by_measure_id_json = {}
       cqm_measures.each do |cqm_measure|
-        @value_sets_by_measure_id_json[cqm_measure.id] = cqm_measure.value_sets.as_json(:except => :_id)
+        @value_sets_by_measure_id_json[cqm_measure.hqmf_set_id] = cqm_measure.value_sets.as_json(:except => :_id)
       end
 
       @value_sets_final = MultiJson.encode @value_sets_by_measure_id_json
@@ -52,9 +52,9 @@ class MeasuresController < ApplicationController
     end
 
     measure_details = {
-     'type'=>params[:measure_type],
-     'episode_of_care'=>params[:calculation_type] == 'episode',
-     'calculate_sdes'=>params[:calc_sde]
+      'type'=>params[:measure_type],
+      'episode_of_care'=>params[:calculation_type] == 'episode',
+      'calculate_sdes'=>params[:calc_sde]
     }
 
     extension = File.extname(params[:measure_file].original_filename).downcase if params[:measure_file]
@@ -88,7 +88,7 @@ class MeasuresController < ApplicationController
             episodes = params["eoc_#{existing.hqmf_set_id}"]
           end
           measure_details['calculate_sdes'] = existing.calculate_sdes
-          measure_details['population_titles'] = existing.populations.map {|p| p['title']} if existing.populations.length > 1    
+          measure_details['population_titles'] = existing.populations.map {|p| p['title']} if existing.populations.length > 1
         else
           raise Exception.new('Update requested, but measure does not exist.')
         end

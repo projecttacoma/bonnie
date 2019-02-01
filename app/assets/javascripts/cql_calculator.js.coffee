@@ -52,7 +52,7 @@
 
       # Grab ELM JSON from measure, use clone so that the function added from observations does not get added over and over again
       cql_libraries = _.clone(cqm_measure.get('cql_libraries'))
-     
+
       main_library_version = ''
       main_library_index = 0
 
@@ -63,31 +63,31 @@
         if cql_library.is_main_library
           main_library_version = cql_library.library_version
           main_library_index = index
-        # Grab just the elm of the cql_library        
+        # Grab just the elm of the cql_library
         elm.push(cql_library.elm)
 
       observations = population.collection.parent.get('observations')
       observation_defs = []
       if observations
-         for obs in observations
-           generatedELMJSON = @generateELMJSONFunction(obs.function_name, obs.parameter)
-           # Save the name of the generated define statement, so we can check
-           # its result later in the CQL calculation process. These added
-           # define statements are called 'BonnieFunction_' followed by the
-           # name of the function - see the 'generateELMJSONFunction' function.
-           observation_defs.push('BonnieFunction_' + obs.function_name)
-           # Check to see if the gneratedELMJSON function is already in the definitions
-           # Added a check to support old ELM representation and new Array representation.
-           if Array.isArray(elm) && (elm[main_library_index]['library']['statements']['def'].filter (def) -> def.name == generatedELMJSON.name).length == 0
-             elm[main_library_index]["library"]["statements"]["def"].push generatedELMJSON
-           else if !Array.isArray(elm) && (elm["library"]["statements"]["def"].filter (def) -> def.name == generatedELMJSON.name).length == 0
-             elm["library"]["statements"]["def"].push generatedELMJSON
+        for obs in observations
+          generatedELMJSON = @generateELMJSONFunction(obs.function_name, obs.parameter)
+          # Save the name of the generated define statement, so we can check
+          # its result later in the CQL calculation process. These added
+          # define statements are called 'BonnieFunction_' followed by the
+          # name of the function - see the 'generateELMJSONFunction' function.
+          observation_defs.push('BonnieFunction_' + obs.function_name)
+          # Check to see if the gneratedELMJSON function is already in the definitions
+          # Added a check to support old ELM representation and new Array representation.
+          if Array.isArray(elm) && (elm[main_library_index]['library']['statements']['def'].filter (def) -> def.name == generatedELMJSON.name).length == 0
+            elm[main_library_index]["library"]["statements"]["def"].push generatedELMJSON
+          else if !Array.isArray(elm) && (elm["library"]["statements"]["def"].filter (def) -> def.name == generatedELMJSON.name).length == 0
+            elm["library"]["statements"]["def"].push generatedELMJSON
 
       # Set all value set versions to 'undefined' so the execution engine does not grab the specified version in the ELM
       elm = @setValueSetVersionsToUndefined(elm)
 
       # Grab the correct version of value sets to pass into the exectuion engine.
-      measure_value_sets = @valueSetsForCodeService(bonnie.valueSetsByOid[cqm_measure.id], cqm_measure.get('hqmf_set_id'))
+      measure_value_sets = @valueSetsForCodeService(bonnie.valueSetsByOid[cqm_measure.get('hqmf_set_id')], cqm_measure.get('hqmf_set_id'))
 
       # Calculate results for each CQL statement
       results = executeSimpleELM(elm, patientSource, measure_value_sets, cqm_measure.get('main_cql_library'), main_library_version, executionDateTime, params)
@@ -115,7 +115,7 @@
         else
           # calculate relevance for patient based measure
           population_relevance = @_buildPopulationRelevanceMap(population_results)
-    
+
         result.set {'population_relevance': population_relevance }
         # Add 'statement_relevance', 'statement_results' and 'clause_results' generated in the CQLResultsHelpers class.
         result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, population.collection.parent, cqm_measure.get('population_sets')[0]) }
@@ -537,7 +537,7 @@
             expression: {
               name: parameter,
               type: 'ExpressionRef'
-             }
+            }
           }
         ]
         relationship: [],
