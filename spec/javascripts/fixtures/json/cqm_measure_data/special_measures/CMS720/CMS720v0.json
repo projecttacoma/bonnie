@@ -5247,13 +5247,13 @@
   "title": "Median Time from ED Arrival to ED Departure for Admitted ED Patients",
   "updated_at": null,
   "value_set_ids": [
-    "5c549d1157a11ec34118f7bd",
-    "5c549d1157a11ec34118f7be",
-    "5c549d1157a11ec34118f7bf",
-    "5c549d1157a11ec34118f7c0",
-    "5c549d1157a11ec34118f7c1",
-    "5c549d1157a11ec34118f7c2",
-    "5c549d1157a11ec34118f7c3",
-    "5c549d1157a11ec34118f7c4"
+    "5c5b3a8f57a11e614e046b30",
+    "5c5b3a8f57a11e614e046b31",
+    "5c5b3a8f57a11e614e046b32",
+    "5c5b3a8f57a11e614e046b33",
+    "5c5b3a8f57a11e614e046b34",
+    "5c5b3a8f57a11e614e046b35",
+    "5c5b3a8f57a11e614e046b36",
+    "5c5b3a8f57a11e614e046b37"
   ]
 }
