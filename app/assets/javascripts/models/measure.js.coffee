@@ -13,14 +13,15 @@ class Thorax.Models.Measure extends Thorax.Model
     alphabet = 'abcdefghijklmnopqrstuvwxyz' # for population sub-ids
     populationSets = new Thorax.Collections.PopulationSets [], parent: this
 
-    for populationSet, index of attrs.population_sets
+    for index, populationSet of attrs.population_sets
       populationSet.sub_id = alphabet[index]
       populationSet.index = index
       delete populationSet._id
       # copy population criteria data to population
       for popCode of populationSet.populations
         # preserve the original population code for specifics rationale
-        population[popCode] = _(code: popCode).extend(attrs.population_criteria[popCode])
+        if popCode != '_type'
+          populationSet[popCode] = _(code: popCode).extend(attrs.population_criteria[popCode])
       populationSets.add new Thorax.Models.PopulationSet(populationSet)
 
     attrs.populations = populationSets
@@ -65,7 +66,7 @@ class Thorax.Models.Measure extends Thorax.Model
   populationCriteria: -> _.intersection(Thorax.Models.Measure.allPopulationCodes, _(@get('population_criteria')).map (p) -> p.type)
 
   valueSets: ->
-    bonnie.valueSetsByOid[@get('id')]
+    bonnie.valueSetsByOid[@get('hqmf_set_id')]
 
   hasCode: (code, code_system) ->
     @valueSets().any (vs) ->

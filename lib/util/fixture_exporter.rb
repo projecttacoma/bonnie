@@ -114,10 +114,10 @@ class FixtureExporter
   def add_relevant_value_sets_as_transformed_hash(map_to_add_to, measure)
     extract_relevant_value_sets(measure).each do |oid, version_to_vs_map|
       version_to_vs_map.each do |version, valueset|
-        if map_to_add_to[oid].present?
-          map_to_add_to[oid][version] = as_transformed_hash(valueset)
+        if map_to_add_to[measure.hqmf_set_id].present?
+          map_to_add_to[measure.hqmf_set_id].push(as_transformed_hash(valueset))
         else
-          map_to_add_to[oid] = { version => as_transformed_hash(valueset) }
+          map_to_add_to[measure.hqmf_set_id] = [as_transformed_hash(valueset)]
         end
       end
     end
