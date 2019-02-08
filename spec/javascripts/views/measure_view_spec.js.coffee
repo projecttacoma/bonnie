@@ -3,18 +3,18 @@
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()
       @oldBonnieValueSetsByOid = bonnie.valueSetsByOid
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS160/value_sets.json')
 
-      @measure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
+      @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
       # Add some overlapping codes to the value sets to exercise the overlapping value sets feature
       # We add the overlapping codes after 10 non-overlapping codes to provide regression for a bug
-      @vs1 = @measure.valueSets().findWhere(display_name: 'Bipolar Disorder')
-      @vs2 = @measure.valueSets().findWhere(display_name: 'Dysthymia')
+      @vs1 = _.find(@measure.valueSets(), (val_set) -> val_set.display_name is 'Bipolar Disorder')
+      @vs2 = _.find(@measure.valueSets(), (val_set) -> val_set.display_name is 'Dysthymia')
       for n in [1..10]
-        @vs1.get('concepts').push { code: "ABC#{n}", display_name: "ABC", code_system_name: "ABC" }
-        @vs2.get('concepts').push { code: "XYZ#{n}", display_name: "XYZ", code_system_name: "XYZ" }
-      @vs1.get('concepts').push { code: "OVERLAP", display_name: "OVERLAP", code_system_name: "OVERLAP" }
-      @vs2.get('concepts').push { code: "OVERLAP", display_name: "OVERLAP", code_system_name: "OVERLAP" }
+        @vs1.concepts.push { code: "ABC#{n}", display_name: "ABC", code_system_name: "ABC" }
+        @vs2.concepts.push { code: "XYZ#{n}", display_name: "XYZ", code_system_name: "XYZ" }
+      @vs1.concepts.push { code: "OVERLAP", display_name: "OVERLAP", code_system_name: "OVERLAP" }
+      @vs2.concepts.push { code: "OVERLAP", display_name: "OVERLAP", code_system_name: "OVERLAP" }
       @patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS160/patients.json'), parse: true
       @measure.set('patients', @patients)
       @patient = @patients.at(0)
@@ -27,8 +27,8 @@
     afterEach ->
       bonnie.valueSetsByOid = @oldBonnieValueSetsByOid
       # Remove the 11 extra codes that were added for value set overlap testing
-      @vs1.get('concepts').splice(-11, 11)
-      @vs2.get('concepts').splice(-11, 11)
+      @vs1.concepts.splice(-11, 11)
+      @vs2.concepts.splice(-11, 11)
       @measureView.remove()
       @cqlMeasureValueSetsView.remove()
 

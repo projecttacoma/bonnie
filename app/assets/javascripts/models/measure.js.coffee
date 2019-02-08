@@ -13,7 +13,7 @@ class Thorax.Models.Measure extends Thorax.Model
     alphabet = 'abcdefghijklmnopqrstuvwxyz' # for population sub-ids
     populationSets = new Thorax.Collections.PopulationSets [], parent: this
 
-    for index, populationSet of attrs.population_sets
+    for populationSet, index in attrs.population_sets
       populationSet.sub_id = alphabet[index]
       populationSet.index = index
       delete populationSet._id
