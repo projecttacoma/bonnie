@@ -56,9 +56,9 @@ class CQLResultsHelpers
     # build map defaulting to not applicable (NA) using cql_statement_dependencies structure
     statementRelevance = {}
     for library in measure.get('cql_libraries')
+      statementRelevance[library.library_name] = {}
       for statement in library.statement_dependencies
-        statementRelevance[library.library_name] = {}
-        statementRelevance[library.library_name].statement_name = "NA"
+        statementRelevance[library.library_name][statement.statement_name] = "NA"
 
     if measure.get('calculate_sdes') && populationSet.get('supplemental_data_elements')
       for statement in populationSet.get('supplemental_data_elements')
@@ -94,20 +94,25 @@ class CQLResultsHelpers
       statementRelevance[libraryName][statementName] = if relevant then 'TRUE' else 'FALSE'
 
       library = (lib for lib in cql_statement_dependencies when lib.library_name is libraryName)
-      statement = (stat for stat in library.statement_dependencies when stat.statement_name is statementName)
-      if !statement.statement_referendes
+      statement = {}
+      for lib in library
+        for stat in lib.statement_dependencies
+          if stat.statement_name == statementName
+            # Is there only goint to be one?
+            statement = stat
+      if !statement.statement_references
         return []
-      
-      return statement.statement_references.map (dependentStatement) ->
-        this._markStatementRelevant(
-          cql_statement_dependencies,
-          statementRelevance,
-          dependentStatement.library_name,
-          dependentStatement.statement_name,
-          relevant
-        )
-  #    for dependentStatement in cql_statement_dependencies[libraryName][statementName]
-  #      @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
+
+      #return statement.statement_references.map (dependentStatement) ->
+      #  @._markStatementRelevant(
+      #    cql_statement_dependencies,
+      #    statementRelevance,
+      #    dependentStatement.library_name,
+      #    dependentStatement.statement_name,
+      #    relevant
+      #  )
+      for dependentStatement in statement.statement_references
+        @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
 
   ###*
   # Builds the result structures for the statements and the clauses. These are named `statement_results` and
