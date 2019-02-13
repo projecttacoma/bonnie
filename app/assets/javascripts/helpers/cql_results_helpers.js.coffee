@@ -181,55 +181,55 @@ class CQLResultsHelpers
     statementResults = {}
     clauseResults = {}
     emptyResultClauses = []
-    for lib, statements of measure.get('cql_statement_dependencies')
-      statementResults[lib] = {}
-      clauseResults[lib] = {}
-      for statementName of statements
-        rawStatementResult = @_findResultForStatementClause(measure, lib, statementName, rawClauseResults)
-        statementResults[lib][statementName] = { raw: rawStatementResult}
-        isSDE = CQLMeasureHelpers.isSupplementalDataElementStatement(measure.get('populations').first(), statementName)
-        if (!measure.get('calculate_sdes') && isSDE) || statementRelevance[lib][statementName] == 'NA'
-          statementResults[lib][statementName].final = 'NA'
-          statementResults[lib][statementName].pretty = 'NA' if doPretty
-        else if statementRelevance[lib][statementName] == 'FALSE' || !rawClauseResults[lib]?
-          statementResults[lib][statementName].final = 'UNHIT'
+    for library in measure.get('cql_libraries')
+      statementResults[library.library_name] = {}
+      clauseResults[library.library_name] = {}
+      for statement in library.statement_dependencies
+        rawStatementResult = @_findResultForStatementClause(measure, library.library_name, statement.statement_name, rawClauseResults)
+        statementResults[library.library_name][statement.statement_name] = { raw: rawStatementResult}
+        isSDE = CQLMeasureHelpers.isSupplementalDataElementStatement(measure.get('populations').first(), statement.statement_name)
+        if (!measure.get('calculate_sdes') && isSDE) || statementRelevance[library.library_name][statement.statement_name] == 'NA'
+          statementResults[library.library_name][statement.statement_name].final = 'NA'
+          statementResults[library.library_name][statement.statement_name].pretty = 'NA' if doPretty
+        else if statementRelevance[library.library_name][statement.statement_name] == 'FALSE' || !rawClauseResults[library.library_name]?
+          statementResults[library.library_name][statement.statement_name].final = 'UNHIT'
           # even if the statement wasn't hit, we want the pretty result to just be FUNCTION for functions
-          if CQLMeasureHelpers.isStatementFunction(measure, lib, statementName)
-            statementResults[lib][statementName].pretty = "FUNCTION" if doPretty
+          if CQLMeasureHelpers.isStatementFunction(measure, library, statement.statement_name)
+            statementResults[library.library_name][statement.statement_name].pretty = "FUNCTION" if doPretty
           else
-            statementResults[lib][statementName].pretty = 'UNHIT' if doPretty
+            statementResults[library.library_name][statement.statement_name].pretty = 'UNHIT' if doPretty
         else
           if @_doesResultPass(rawStatementResult)
-            statementResults[lib][statementName].final = 'TRUE'
-            statementResults[lib][statementName].pretty = @prettyResult(rawStatementResult) if doPretty
+            statementResults[library.library_name][statement.statement_name].final = 'TRUE'
+            statementResults[library.library_name][statement.statement_name].pretty = @prettyResult(rawStatementResult) if doPretty
           else
-            statementResults[lib][statementName].final = 'FALSE'
+            statementResults[library.library_name][statement.statement_name].final = 'FALSE'
             if rawStatementResult instanceof Array && rawStatementResult.length == 0
               # Special case, handle empty array.
-              statementResults[lib][statementName].pretty = "FALSE ([])" if doPretty
-            else if CQLMeasureHelpers.isStatementFunction(measure, lib, statementName)
-             statementResults[lib][statementName].pretty = "FUNCTION" if doPretty
+              statementResults[library.library_name][statement.statement_name].pretty = "FALSE ([])" if doPretty
+            else if CQLMeasureHelpers.isStatementFunction(measure, library, statement.statement_name)
+              statementResults[library.library_name][statement.statement_name].pretty = "FUNCTION" if doPretty
             else
-              statementResults[lib][statementName].pretty = "FALSE (#{rawStatementResult})" if doPretty
+              statementResults[library.library_name][statement.statement_name].pretty = "FALSE (#{rawStatementResult})" if doPretty
 
         # create clause results for all localIds in this statement
-        localIds = measure.findAllLocalIdsInStatementByName(lib, statementName)
+        localIds = measure.findAllLocalIdsInStatementByName(library.library_name, statement.statement_name)
         for localId, clause of localIds
           clauseResult =
             # if this clause is an alias or a usage of alias it will get the raw result from the sourceLocalId.
-            raw: rawClauseResults[lib]?[if clause.sourceLocalId? then clause.sourceLocalId else localId],
-            statementName: statementName
+            raw: rawClauseResults[library.library_name]?[if clause.sourceLocalId? then clause.sourceLocalId else localId],
+            statementName: statement.statement_name
 
           clauseResult.final = @_setFinalResults(
             statementRelevance: statementRelevance,
-            statementName: statementName,
+            statementName: statement.statement_name,
             rawClauseResults: rawClauseResults
-            lib: lib,
+            lib: library.library_name,
             localId: localId,
             clause: clause,
             rawResult: clauseResult.raw)
 
-          clauseResults[lib][localId] = clauseResult
+          clauseResults[library.library_name][localId] = clauseResult
 
     return { statement_results: statementResults, clause_results: clauseResults }
 
@@ -325,10 +325,10 @@ class CQLResultsHelpers
   @_findResultForStatementClause: (measure, libraryName, statementName, rawClauseResults) ->
     library = null
     statement = null
-    for lib in measure.get('elm')
-      if lib.library.identifier.id == libraryName
+    for lib in measure.get('cql_libraries')
+      if lib.elm.library.identifier.id == libraryName
         library = lib
-    for curStatement in library.library.statements.def
+    for curStatement in library.elm.library.statements.def
       if curStatement.name == statementName
         statement = curStatement
     return rawClauseResults[libraryName]?[statement.localId]
