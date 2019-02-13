@@ -66,7 +66,7 @@
         # Grab just the elm of the cql_library
         elm.push(cql_library.elm)
 
-      observations = population.collection.parent.get('observations')
+      observations = cqm_measure.get('observations')
       observation_defs = []
       if observations
         for obs in observations
@@ -100,7 +100,7 @@
         population_relevance = {}
 
         # handle episode of care measure results
-        if population.collection.parent.get('episode_of_care')
+        if cqm_measure.get('episode_of_care')
           result.set {'episode_results': episode_results}
           # calculate relevance only if there were recorded episodes
           if Object.keys(episode_results).length > 0
@@ -118,8 +118,8 @@
 
         result.set {'population_relevance': population_relevance }
         # Add 'statement_relevance', 'statement_results' and 'clause_results' generated in the CQLResultsHelpers class.
-        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, population.collection.parent, cqm_measure.get('displayedPopulation'))}
-        result.set CQLResultsHelpers.buildStatementAndClauseResults(population.collection.parent, results.localIdPatientResultsMap[patient['id']], result.get('statement_relevance'), !!options['doPretty'])
+        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, cqm_measure, cqm_measure.get('displayedPopulation'))}
+        result.set CQLResultsHelpers.buildStatementAndClauseResults(cqm_measure, results.localIdPatientResultsMap[patient['id']], result.get('statement_relevance'), !!options['doPretty'])
 
         result.set {'patient_id': patient['id']} # Add patient_id to result in order to delete patient from population_calculation_view
         result.state = 'complete'
@@ -257,7 +257,7 @@
         if population.get(popCode)?
           # Grab CQL result value and adjust for Bonnie
           # TODO Handle mutliple population sets
-          value = results['patientResults'][patient.id][population.collection.parent.get('population_sets')[0][popCode]]
+          value = results['patientResults'][patient.id][population.collection.parent.get('population_sets')[0].populations[popCode].statement_name]
           if Array.isArray(value) and value.length > 0
             population_results[popCode] = value.length
           else if typeof value is 'boolean' and value
