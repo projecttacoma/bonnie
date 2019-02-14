@@ -98,27 +98,28 @@ class FixtureExporter
 
   def extract_relevant_value_sets(measure)
     oid_to_vs_map = {}
+    val_sets = []
     relevant_vs_version = get_relevant_version_of_valuesets(measure)
     measure.value_sets.each do |vs|
       if oid_to_vs_map[vs.oid]
         # if there are multiple value sets with the same oid for this user, then keep the one with
         # the Draft- version corresponding to this measure for the fixture.
         oid_to_vs_map[vs.oid] = { vs.version => vs } if vs.version == relevant_vs_version
+        val_sets << vs if vs.version == relevant_vs_version
       else
         oid_to_vs_map[vs.oid] = { vs.version => vs }
+        val_sets << vs
       end
     end
-    return oid_to_vs_map
+    return val_sets
   end
 
   def add_relevant_value_sets_as_transformed_hash(map_to_add_to, measure)
-    extract_relevant_value_sets(measure).each do |oid, version_to_vs_map|
-      version_to_vs_map.each do |version, valueset|
-        if map_to_add_to[measure.hqmf_set_id].present?
-          map_to_add_to[measure.hqmf_set_id].push(as_transformed_hash(valueset))
-        else
-          map_to_add_to[measure.hqmf_set_id] = [as_transformed_hash(valueset)]
-        end
+    extract_relevant_value_sets(measure).each do |valueset|
+      if map_to_add_to[measure.hqmf_set_id].present?
+        map_to_add_to[measure.hqmf_set_id].push(as_transformed_hash(valueset))
+      else
+        map_to_add_to[measure.hqmf_set_id] = [as_transformed_hash(valueset)]
       end
     end
   end

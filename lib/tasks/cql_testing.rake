@@ -18,7 +18,7 @@ namespace :bonnie do
     # e.g., bundle exec rake bonnie:fixtures:generate_frontend_cql_fixtures[cms,test/fake,bonnie@test.org,CMS68v5,nil,nil]
     task :generate_frontend_cql_fixtures, [:cms_hqmf, :path, :user_email, :measure_id, :patient_first_name, :patient_last_name] => [:environment] do |t, args|
       fixtures_path = File.join('spec', 'javascripts', 'fixtures', 'json')
-      measure_file_path = File.join(fixtures_path, 'measure_data', args[:path])
+      measure_file_path = File.join(fixtures_path, 'cqm_measure_data', args[:path])
       record_file_path = File.join(fixtures_path, 'cqm_records', args[:path])
 
       user = User.find_by email: args[:user_email]
