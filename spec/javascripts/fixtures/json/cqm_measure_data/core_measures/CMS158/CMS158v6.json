@@ -1,4 +1,5 @@
 {
+  "_id": "5c65c92557a11ed2575e1456",
   "calculate_sdes": null,
   "calculation_method": "PATIENT",
   "cms_id": "CMS158v6",
@@ -10,6 +11,7 @@
   "composite_hqmf_set_id": null,
   "cql_libraries": [
     {
+      "_id": "5c65c92557a11ed2575e1457",
       "cql": "library PregnantwomenthathadHBsAgtesting version '6.0.001'\r\n\r\nusing QDM version '5.3'\r\n\r\nvalueset \"ONC Administrative Sex\": 'urn:oid:2.16.840.1.113762.1.4.1'\r\nvalueset \"Race\": 'urn:oid:2.16.840.1.114222.4.11.836'\r\nvalueset \"Ethnicity\": 'urn:oid:2.16.840.1.114222.4.11.837'\r\nvalueset \"Payer\": 'urn:oid:2.16.840.1.114222.4.11.3591'\r\nvalueset \"Delivery - Diagnosis\": 'urn:oid:2.16.840.1.113883.3.67.1.101.1.278'\r\nvalueset \"Delivery - Procedure\": 'urn:oid:2.16.840.1.113762.1.4.1078.5'\r\nvalueset \"Female\": 'urn:oid:2.16.840.1.113883.3.560.100.2'\r\nvalueset \"HBsAg\": 'urn:oid:2.16.840.1.113883.3.67.1.101.1.279'\r\nvalueset \"Hepatitis B\": 'urn:oid:2.16.840.1.113883.3.67.1.101.1.269'\r\n\r\nparameter \"Measurement Period\" Interval<DateTime>\r\n\r\ncontext Patient\r\n\r\ndefine \"SDE Ethnicity\":\r\n\t[\"Patient Characteristic Ethnicity\": \"Ethnicity\"]\r\n\r\ndefine \"SDE Payer\":\r\n\t[\"Patient Characteristic Payer\": \"Payer\"]\r\n\r\ndefine \"SDE Race\":\r\n\t[\"Patient Characteristic Race\": \"Race\"]\r\n\r\ndefine \"SDE Sex\":\r\n\t[\"Patient Characteristic Sex\": \"ONC Administrative Sex\"]\r\n\r\ndefine \"Most Recent Delivery\":\r\n\tLast([\"Procedure, Performed\": \"Delivery - Procedure\"] DeliveryProcedure\r\n\t\t\twhere DeliveryProcedure.relevantPeriod during \"Measurement Period\"\r\n\t\t\tsort by start of relevantPeriod\r\n\t)\r\n\r\ndefine \"Denominator Exceptions\":\r\n\texists ( [\"Diagnosis\": \"Hepatitis B\"] HepB\r\n\t\t\twith \"Most Recent Delivery Overlaps Diagnosis\" DeliveryOverlapsDiagnosis\r\n\t\t\t\tsuch that HepB.prevalencePeriod starts 365 days or less before start of DeliveryOverlapsDiagnosis.relevantPeriod\r\n\t\t\t\t\tor HepB.prevalencePeriod ends 365 days or less before start of DeliveryOverlapsDiagnosis.relevantPeriod\r\n\t)\r\n\r\ndefine \"Most Recent Delivery Overlaps Diagnosis\":\r\n\t\"Most Recent Delivery\" MostRecentDelivery\r\n\t\twhere exists ( [\"Diagnosis\": \"Delivery - Diagnosis\"] DeliveryDiagnosis\r\n\t\t\t\twhere MostRecentDelivery.relevantPeriod overlaps DeliveryDiagnosis.prevalencePeriod\r\n\t\t)\r\n\r\ndefine \"Initial Population\":\r\n\t\"Most Recent Delivery Overlaps Diagnosis\" is not null\r\n\t\tand AgeInYearsAt(start of \"Measurement Period\")>= 12\r\n\t\tand exists ( [\"Patient Characteristic Sex\": \"Female\"] )\r\n\r\ndefine \"Numerator\":\r\n\texists ( [\"Laboratory Test, Performed\": \"HBsAg\"] LabTest\r\n\t\t\twith \"Most Recent Delivery Overlaps Diagnosis\" DeliveryOverlapsDiagnosis\r\n\t\t\t\tsuch that LabTest.relevantPeriod starts 280 days or less before start of DeliveryOverlapsDiagnosis.relevantPeriod\r\n\t)\r\n\r\ndefine \"Denominator\":\r\n\t\"Initial Population\"\r\n",
       "elm": {
         "library": {
@@ -3861,63 +3863,79 @@
       "library_version": "6.0.001",
       "statement_dependencies": [
         {
+          "_id": "5c65c92557a11ed2575e1458",
           "statement_name": "Patient"
         },
         {
+          "_id": "5c65c92557a11ed2575e1459",
           "statement_name": "SDE Ethnicity"
         },
         {
+          "_id": "5c65c92557a11ed2575e145a",
           "statement_name": "SDE Payer"
         },
         {
+          "_id": "5c65c92557a11ed2575e145b",
           "statement_name": "SDE Race"
         },
         {
+          "_id": "5c65c92557a11ed2575e145c",
           "statement_name": "SDE Sex"
         },
         {
+          "_id": "5c65c92557a11ed2575e145d",
           "statement_name": "Most Recent Delivery"
         },
         {
+          "_id": "5c65c92557a11ed2575e145e",
           "statement_name": "Most Recent Delivery Overlaps Diagnosis",
           "statement_references": [
             {
+              "_id": "5c65c92557a11ed2575e145f",
               "library_name": "PregnantwomenthathadHBsAgtesting",
               "statement_name": "Most Recent Delivery"
             }
           ]
         },
         {
+          "_id": "5c65c92557a11ed2575e1460",
           "statement_name": "Denominator Exceptions",
           "statement_references": [
             {
+              "_id": "5c65c92557a11ed2575e1461",
               "library_name": "PregnantwomenthathadHBsAgtesting",
               "statement_name": "Most Recent Delivery Overlaps Diagnosis"
             }
           ]
         },
         {
+          "_id": "5c65c92557a11ed2575e1462",
           "statement_name": "Initial Population",
           "statement_references": [
             {
+              "_id": "5c65c92557a11ed2575e1463",
               "library_name": "PregnantwomenthathadHBsAgtesting",
               "statement_name": "Most Recent Delivery Overlaps Diagnosis"
             }
           ]
         },
         {
+          "_id": "5c65c92557a11ed2575e1464",
           "statement_name": "Numerator",
           "statement_references": [
             {
+              "_id": "5c65c92557a11ed2575e1465",
               "library_name": "PregnantwomenthathadHBsAgtesting",
               "statement_name": "Most Recent Delivery Overlaps Diagnosis"
             }
           ]
         },
         {
+          "_id": "5c65c92557a11ed2575e1466",
           "statement_name": "Denominator",
           "statement_references": [
             {
+              "_id": "5c65c92557a11ed2575e1467",
               "library_name": "PregnantwomenthathadHBsAgtesting",
               "statement_name": "Initial Population"
             }
@@ -4707,25 +4725,30 @@
   },
   "population_sets": [
     {
+      "_id": "5c65c92557a11ed2575e1468",
       "population_set_id": "PopulationCriteria1",
       "populations": {
         "DENEXCEP": {
+          "_id": "5c65c92557a11ed2575e1469",
           "library_name": "PregnantwomenthathadHBsAgtesting",
           "statement_name": "Denominator Exceptions"
         },
         "DENOM": {
+          "_id": "5c65c92557a11ed2575e146a",
           "library_name": "PregnantwomenthathadHBsAgtesting",
           "statement_name": "Denominator"
         },
         "IPP": {
+          "_id": "5c65c92557a11ed2575e146b",
           "library_name": "PregnantwomenthathadHBsAgtesting",
           "statement_name": "Initial Population"
         },
         "NUMER": {
+          "_id": "5c65c92557a11ed2575e146c",
           "library_name": "PregnantwomenthathadHBsAgtesting",
           "statement_name": "Numerator"
         },
-        "_type": "CQM::ProportionPopulationMap"
+        "_id": "5c65c92557a11ed2575e146d"
       },
       "title": "Population Criteria Section"
     }
@@ -5025,15 +5048,16 @@
   },
   "title": "Pregnant women that had HBsAg testing",
   "updated_at": null,
+  "user_id": "501fdba3044a111b98000001",
   "value_set_ids": [
-    "5c5b3a4b57a11e5f76b925d0",
-    "5c5b3a4b57a11e5f76b925d1",
-    "5c5b3a4b57a11e5f76b925d2",
-    "5c5b3a4b57a11e5f76b925d3",
-    "5c5b3a4b57a11e5f76b925d4",
-    "5c5b3a4b57a11e5f76b925d5",
-    "5c5b3a4b57a11e5f76b925d6",
-    "5c5b3a4b57a11e5f76b925d7",
-    "5c5b3a4b57a11e5f76b925d8"
+    "5c65c92557a11ed2575e144d",
+    "5c65c92557a11ed2575e144e",
+    "5c65c92557a11ed2575e144f",
+    "5c65c92557a11ed2575e1450",
+    "5c65c92557a11ed2575e1451",
+    "5c65c92557a11ed2575e1452",
+    "5c65c92557a11ed2575e1453",
+    "5c65c92557a11ed2575e1454",
+    "5c65c92557a11ed2575e1455"
   ]
 }
