@@ -1,4 +1,5 @@
 {
+  "_id": "5c65c9f357a11ed7e871a29e",
   "calculate_sdes": null,
   "calculation_method": "PATIENT",
   "cms_id": "CMS760v0",
@@ -10,6 +11,7 @@
   "composite_hqmf_set_id": null,
   "cql_libraries": [
     {
+      "_id": "5c65c9f357a11ed7e871a29f",
       "cql": "library PD0329 version '0.0.004'\r\n\r\nusing QDM version '5.3'\r\n\r\nvalueset \"ONC Administrative Sex\": 'urn:oid:2.16.840.1.113762.1.4.1'\r\nvalueset \"Race\": 'urn:oid:2.16.840.1.114222.4.11.836'\r\nvalueset \"Ethnicity\": 'urn:oid:2.16.840.1.114222.4.11.837'\r\nvalueset \"Payer\": 'urn:oid:2.16.840.1.114222.4.11.3591'\r\nvalueset \"Medicare Fee For Service\": 'urn:oid:2.16.840.1.113883.3.1240.15.2.4008'\r\nvalueset \"Inpatient Encounter\": 'urn:oid:2.16.840.1.113883.3.464.1003.101.12.1060'\r\n\r\nparameter \"Measurement Period\" Interval<DateTime>\r\n\r\ncontext Patient\r\n\r\ndefine \"SDE Ethnicity\":\r\n\t[\"Patient Characteristic Ethnicity\": \"Ethnicity\"]\r\n\r\ndefine \"SDE Payer\":\r\n\t[\"Patient Characteristic Payer\": \"Payer\"]\r\n\r\ndefine \"SDE Race\":\r\n\t[\"Patient Characteristic Race\": \"Race\"]\r\n\r\ndefine \"SDE Sex\":\r\n\t[\"Patient Characteristic Sex\": \"ONC Administrative Sex\"]\r\n\r\ndefine \"Interesting Encounter\":\r\n\t[\"Encounter, Performed\": \"Inpatient Encounter\"] Enc\r\n\t\twhere start of Enc.relevantPeriod during \"Measurement Period\"\r\n\r\ndefine \"Medicare Fee\":\r\n\t\"Interesting Encounter\" Enc\r\n\t\twith [\"Patient Characteristic Payer\": \"Medicare Fee For Service\"] Fee\r\n\t\t\tsuch that Fee.relevantPeriod overlaps Enc.relevantPeriod\r\n\r\ndefine \"Denominator\":\r\n\t\"Initial Population\"\r\n\r\ndefine \"Numerator\":\r\n\texists \"Medicare Fee\"\r\n\r\ndefine \"Initial Population\":\r\n\tPatient.birthDatetime in \"IntervalWithTZOffsets\"\r\n\r\ndefine \"IntervalWithTZOffsets\":\r\n\tInterval[DateTime(year from start of \"Measurement Period\", 8, 1), DateTime(year from start of \"Measurement Period\", 12, 31)]\r\n",
       "elm": {
         "library": {
@@ -2146,57 +2148,72 @@
       "library_version": "0.0.004",
       "statement_dependencies": [
         {
+          "_id": "5c65c9f357a11ed7e871a2a0",
           "statement_name": "Patient"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a1",
           "statement_name": "SDE Ethnicity"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a2",
           "statement_name": "SDE Payer"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a3",
           "statement_name": "SDE Race"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a4",
           "statement_name": "SDE Sex"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a5",
           "statement_name": "Interesting Encounter"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a6",
           "statement_name": "Medicare Fee",
           "statement_references": [
             {
+              "_id": "5c65c9f357a11ed7e871a2a7",
               "library_name": "PD0329",
               "statement_name": "Interesting Encounter"
             }
           ]
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a8",
           "statement_name": "IntervalWithTZOffsets"
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2a9",
           "statement_name": "Initial Population",
           "statement_references": [
             {
+              "_id": "5c65c9f357a11ed7e871a2aa",
               "library_name": "PD0329",
               "statement_name": "IntervalWithTZOffsets"
             }
           ]
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2ab",
           "statement_name": "Denominator",
           "statement_references": [
             {
+              "_id": "5c65c9f357a11ed7e871a2ac",
               "library_name": "PD0329",
               "statement_name": "Initial Population"
             }
           ]
         },
         {
+          "_id": "5c65c9f357a11ed7e871a2ad",
           "statement_name": "Numerator",
           "statement_references": [
             {
+              "_id": "5c65c9f357a11ed7e871a2ae",
               "library_name": "PD0329",
               "statement_name": "Medicare Fee"
             }
@@ -2907,21 +2924,25 @@
   },
   "population_sets": [
     {
+      "_id": "5c65c9f357a11ed7e871a2af",
       "population_set_id": "PopulationCriteria1",
       "populations": {
         "DENOM": {
+          "_id": "5c65c9f357a11ed7e871a2b0",
           "library_name": "PD0329",
           "statement_name": "Denominator"
         },
         "IPP": {
+          "_id": "5c65c9f357a11ed7e871a2b1",
           "library_name": "PD0329",
           "statement_name": "Initial Population"
         },
         "NUMER": {
+          "_id": "5c65c9f357a11ed7e871a2b2",
           "library_name": "PD0329",
           "statement_name": "Numerator"
         },
-        "_type": "CQM::ProportionPopulationMap"
+        "_id": "5c65c9f357a11ed7e871a2b3"
       },
       "title": "Population Criteria Section"
     }
@@ -3195,12 +3216,13 @@
   },
   "title": "PD0329",
   "updated_at": null,
+  "user_id": "501fdba3044a111b98000001",
   "value_set_ids": [
-    "5c5b3a9c57a11e61af3f1517",
-    "5c5b3a9c57a11e61af3f1518",
-    "5c5b3a9c57a11e61af3f1519",
-    "5c5b3a9c57a11e61af3f151a",
-    "5c5b3a9c57a11e61af3f151b",
-    "5c5b3a9c57a11e61af3f151c"
+    "5c65c9f357a11ed7e871a298",
+    "5c65c9f357a11ed7e871a299",
+    "5c65c9f357a11ed7e871a29a",
+    "5c65c9f357a11ed7e871a29b",
+    "5c65c9f357a11ed7e871a29c",
+    "5c65c9f357a11ed7e871a29d"
   ]
 }
