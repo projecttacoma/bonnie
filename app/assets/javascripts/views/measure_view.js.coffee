@@ -9,7 +9,7 @@ class Thorax.Views.MeasureLayout extends Thorax.LayoutView
     _(super).extend
       cms_id: @measure.get 'cms_id'
       hqmf_set_id: @measure.get 'hqmf_set_id'
-      cql: @measure.has('cql') # Hide certain features in handlebars if the measure is cql.
+      cql: @measure.has('cql_libraries') # Hide certain features in handlebars if the measure is cql.
 
   # Navigates to the Patient Dashboard
   showDashboard: (showFixedColumns) ->
