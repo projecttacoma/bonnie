@@ -30,7 +30,7 @@
     <div class="measure-dsp">
       <h2 class="full-title">{{title}}</h2>
       {{#if episode_of_care}}
-        {{#unless cql}}
+        {{#unless cql_libraries}}
         <div class="measure-dsp-title">
           Episode(s) of Care:
         </div>
@@ -65,7 +65,7 @@
       <span class="settings-container">
         <div class="patients-settings">
           <a data-title="Not yet implemented for QDM 5.4" data-toggle="tooltip" data-placement="bottom">{{#button "exportQrdaPatients" class="btn btn-default export-patients" disabled="true"}}<i class="fa fa-download" aria-hidden="true"></i> QRDA<span class="sr-only">Patient Export</span>{{/button}}</a>
-          {{#if cql}}
+          {{#if cql_libraries}}
             {{#button "exportExcelPatients" class="btn btn-default export-patients"}}<i class="fa fa-download" aria-hidden="true"></i> Excel <span class="sr-only">Patient Export</span>{{/button}}
           {{/if}}
         </div>

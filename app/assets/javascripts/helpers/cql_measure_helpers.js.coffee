@@ -12,7 +12,7 @@ class CQLMeasureHelpers
   ###
   @buildDefineToFullStatement: (measure) ->
     ret = {}
-    for lib of measure.get("cql_libraries")
+    for lib in measure.get("cql_libraries")
       lib_statements = {}
       for statement in lib.elm_annotations.statements
         lib_statements[statement.define_name] = @_parseAnnotationTree(statement.children)
