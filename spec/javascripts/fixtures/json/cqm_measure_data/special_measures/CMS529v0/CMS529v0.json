@@ -1,6 +1,6 @@
 {
   "_id": "5c65ca8f57a11edc02926ba6",
-  "calculate_sdes": null,
+  "calculate_sdes": true,
   "calculation_method": "EPISODE_OF_CARE",
   "cms_id": "CMS529v0",
   "component": false,
@@ -9497,7 +9497,10 @@
         },
         "_id": "5c65ca8f57a11edc02926bd4"
       },
-      "title": "Population Criteria Section"
+      "title": "Population Criteria Section",
+      "supplemental_data_elements": [
+        "Results"
+      ]
     }
   ],
   "source_data_criteria": {

@@ -72,13 +72,13 @@ class Thorax.Views.CqlPopulationLogic extends Thorax.Views.BonnieView
 
     # Look through all elm library structures, and check for CQL errors noted by the translation service.
     # Also finds if using old versions of QDM
-    if Array.isArray @model.get 'elm'
-      _.each @model.get('elm'), (elm) =>
-        _.each elm.library.usings.def, (id) =>
+    if Array.isArray @model.get 'cql_libraries'
+      _.each @model.get('cql_libraries'), (lib) =>
+        _.each lib.elm.library.usings.def, (id) =>
           if id?.localIdentifier == "QDM"
             if !CompareVersion.equalToOrNewer id.version, bonnie.support_qdm_version
               @hasOutdatedQDM = true
-        _.each elm.library.annotation, (annotation) =>
+        _.each lib.elm.library.annotation, (annotation) =>
           if annotation.errorSeverity == "error"
             @hasCqlErrors = true
 
@@ -105,7 +105,7 @@ class Thorax.Views.CqlPopulationLogic extends Thorax.Views.BonnieView
               popNames.push(popCode) if statement.define_name == popStatements.statement_name && library.is_main_library
 
             # Mark if it is in an OBSERV if there are any and we are looking at the main_cql_library
-            if @model.get('observations')? && library.main_cql_library
+            if @model.get('observations')? && library.is_main_library
               for observ, observIndex in @model.get('observations')
                 popNames.push("OBSERV_#{observIndex+1}") if statement.define_name == observ.function_name
 
