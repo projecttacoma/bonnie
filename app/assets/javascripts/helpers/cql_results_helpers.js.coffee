@@ -93,26 +93,14 @@ class CQLResultsHelpers
     if statementRelevance[libraryName][statementName] == 'NA' || statementRelevance[libraryName][statementName] == 'FALSE'
       statementRelevance[libraryName][statementName] = if relevant then 'TRUE' else 'FALSE'
 
-      library = (lib for lib in cql_statement_dependencies when lib.library_name is libraryName)
-      statement = {}
-      for lib in library
-        for stat in lib.statement_dependencies
-          if stat.statement_name == statementName
-            # Is there only goint to be one?
-            statement = stat
-      if !statement.statement_references
-        return []
-
-      #return statement.statement_references.map (dependentStatement) ->
-      #  @._markStatementRelevant(
-      #    cql_statement_dependencies,
-      #    statementRelevance,
-      #    dependentStatement.library_name,
-      #    dependentStatement.statement_name,
-      #    relevant
-      #  )
-      for dependentStatement in statement.statement_references
-        @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
+      for lib in cql_statement_dependencies
+        statement = (stat for stat in lib.statement_dependencies when stat.statement_name is statementName)
+        for stat in statement
+          if !stat.statement_references
+            continue
+          for dependentStatement in stat.statement_references
+            @_markStatementRelevant(cql_statement_dependencies, statementRelevance, dependentStatement.library_name, dependentStatement.statement_name, relevant)
+      return []
 
   ###*
   # Builds the result structures for the statements and the clauses. These are named `statement_results` and
