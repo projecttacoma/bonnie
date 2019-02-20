@@ -20,6 +20,7 @@ class Thorax.Models.Measure extends Thorax.Model
       # copy population criteria data to population
       for popCode of populationSet.populations
         # preserve the original population code for specifics rationale
+        # TODO: Redo fixtures so no _type or _id fields present
         if popCode != '_type'
           populationSet[popCode] = _(code: popCode).extend(attrs.population_criteria[popCode])
       populationSets.add new Thorax.Models.PopulationSet(populationSet)
@@ -29,9 +30,10 @@ class Thorax.Models.Measure extends Thorax.Model
 
     # ignoring versions for diplay names
     oid_display_name_map = {}
-    for oid, versions of bonnie.valueSetsByOid[attrs.hqmf_set_id]
-      for version, vs of versions
-        oid_display_name_map[oid] = vs.display_name if vs?.display_name
+    if bonnie.valueSetsByOid?
+      for oid, versions of bonnie.valueSetsByOid[attrs.hqmf_set_id]
+        for version, vs of versions
+          oid_display_name_map[oid] = vs.display_name if vs?.display_name
 
     for key, data_criteria of attrs.data_criteria
       data_criteria.key = key
