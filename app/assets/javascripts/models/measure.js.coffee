@@ -13,6 +13,9 @@ class Thorax.Models.Measure extends Thorax.Model
     alphabet = 'abcdefghijklmnopqrstuvwxyz' # for population sub-ids
     populationSets = new Thorax.Collections.PopulationSets [], parent: this
 
+    stratificationPopulations = CQLMeasureHelpers.getStratificationsAsPopulationSets(attrs.population_sets)
+    attrs.population_sets = attrs.population_sets.concat stratificationPopulations
+
     for populationSet, index in attrs.population_sets
       populationSet.sub_id = alphabet[index]
       populationSet.index = index

@@ -312,3 +312,34 @@ class CQLMeasureHelpers
   ###
   @isSupplementalDataElementStatement: (population, statementDefine) ->
     return _.contains(population.get('supplemental_data_elements'), statementDefine)
+
+  ###*
+  # Format stratifications as population sets to be added to the measure's population sets
+  # @public {measure} measure - The measure
+  ###
+  @getStratificationsAsPopulationSets: (pop_sets) ->
+    stratificationsAsPopulationSets = []
+    for populationSet in pop_sets
+      if (populationSet.stratifications)
+        for stratification in populationSet.stratifications
+          clonedSet = @deepCopyPopulationSet(populationSet)
+          clonedSet.population_set_id = stratification.stratification_id
+          clonedSet.populations.STRAT = stratification.statement
+          stratificationsAsPopulationSets.push clonedSet
+    return stratificationsAsPopulationSets
+
+  ###*
+  # Returns a copy of the given population set
+  # @public {original} populationSet - The population set to be copied
+  ###
+  @deepCopyPopulationSet: (original) ->
+    copy = {}
+    copy.title = original.title
+    copy.observations = original.observations
+    copy.populations = {}
+    for popCode of original.populations
+      copyPop = {}
+      copyPop.library_name = original.populations[popCode].library_name
+      copyPop.statement_name = original.populations[popCode].statement_name
+      copy.populations[popCode] = copyPop
+    return copy
