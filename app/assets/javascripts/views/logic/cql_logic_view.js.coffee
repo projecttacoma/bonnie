@@ -86,7 +86,7 @@ class Thorax.Views.CqlPopulationLogic extends Thorax.Views.BonnieView
     if @population
       @statementRelevance = CQLMeasureHelpers.getStatementRelevanceForPopulationSet(@model, @population)
 
-    # Check to see if this measure was uploaded with an older version of the loader code that did not get the 
+    # Check to see if this measure was uploaded with an older version of the loader code that did not get the
     # clause level annotations.
     # TODO: Update this check as needed. Remove these checks when CQL has settled for production.
     if @model.get('cql_libraries')?
@@ -105,9 +105,9 @@ class Thorax.Views.CqlPopulationLogic extends Thorax.Views.BonnieView
               popNames.push(popCode) if statement.define_name == popStatements.statement_name && library.is_main_library
 
             # Mark if it is in an OBSERV if there are any and we are looking at the main_cql_library
-            if @model.get('observations')? && library.is_main_library
-              for observ, observIndex in @model.get('observations')
-                popNames.push("OBSERV_#{observIndex+1}") if statement.define_name == observ.function_name
+            if @model.get('population_sets')[0].observations? && library.is_main_library
+              for observ, observIndex in @model.get('population_sets')[0].observations
+                popNames.push("OBSERV_#{observIndex+1}") if statement.define_name == observ.observation_function.statement_name
 
             # create the view for this statement and add it to the list of all views.
             if CQLMeasureHelpers.isStatementFunction(@model, library, statement.define_name)
