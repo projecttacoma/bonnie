@@ -74,8 +74,8 @@ class Thorax.Models.Measure extends Thorax.Model
     bonnie.valueSetsByOid[@get('hqmf_set_id')]
 
   hasCode: (code, code_system) ->
-    @valueSets().any (vs) ->
-      _(vs.get('concepts')).any (c) ->
+    for vs in @valueSets()
+      _(vs.concepts).any (c) ->
         c.code == code && c.code_system_name == code_system
 
   @referencesFor: (criteriaType) ->

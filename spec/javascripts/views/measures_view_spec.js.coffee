@@ -3,7 +3,7 @@ describe 'MeasuresView', ->
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
     @measures = new Thorax.Collections.Measures()
-    @measure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
+    @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
     @measures.add(@measure)
     @measuresView = new Thorax.Views.Measures(collection: @measures)
     @measuresView.render()
@@ -28,6 +28,7 @@ describe 'MeasuresView', ->
   it 'does not have a ExportBundleView instance', ->
     expect(@measuresView.exportBundleView).toBeUndefined()
 
+  # TODO Re-export fixture into cqm format
   describe 'Composite Measures', ->
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()

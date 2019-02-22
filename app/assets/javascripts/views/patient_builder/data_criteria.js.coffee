@@ -115,7 +115,7 @@ class Thorax.Views.EditCriteriaView extends Thorax.Views.BuilderChildView
       end_time: moment.utc(@model.get('end_date')).format('LT') if @model.get('end_date')
       end_date_is_undefined: !@model.has('end_date')
       description: desc
-      value_sets: @model.measure()?.valueSets().map((vs) -> vs.toJSON()) or []
+      value_sets: @model.measure()?.valueSets() or []
       cms_id_number: cmsIdParts[1] if cmsIdParts
       cms_id_version: cmsIdParts[2] if cmsIdParts
       faIcon: @model.faIcon()
@@ -344,7 +344,7 @@ class Thorax.Views.EditCriteriaValueView extends Thorax.Views.BuilderChildView
     # Until then, PQ (Scalar) can be used with "%" as the unit
 
   context: ->
-    codes_list = @measure?.valueSets().map((vs) -> vs.toJSON()) or []
+    codes_list = @measure?.valueSets() or []
     unique_codes = []
     # remove duplicate direct reference code value sets
     direct_reference_codes = []
