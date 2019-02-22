@@ -203,6 +203,14 @@ class MeasuresController < ApplicationController
     redirect_to root_path
   end
 
+  def to_cqm
+    cql_measure = CqlMeasure.by_user(current_user).where(id: params[:id]).first
+    cqm_measure = CQM::Converter::BonnieMeasure.to_cqm(cql_measure)
+    respond_with cqm_measure do |format|
+      format.json { render json: { measure: cqm_measure, value_sets: cqm_measure.value_sets } }
+    end
+  end
+
   private
 
   def get_ticket_granting_ticket
