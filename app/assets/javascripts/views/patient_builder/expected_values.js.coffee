@@ -55,20 +55,19 @@ class Thorax.Views.ExpectedValueView extends Thorax.Views.BuilderChildView
 
   events:
     serialize: (attr) ->
-      population = @measure.get('populations').at @model.get('population_index')
-      for pc in @measure.populationCriteria() when population.has(pc)
-        if @isNumbers || (@isMultipleObserv && (pc == 'OBSERV'))
-          # Only parse existing values
-          if attr[pc]
-            if pc == 'OBSERV'
-              attr[pc] = [].concat(attr[pc])
-              attr[pc] = (Thorax.Models.ExpectedValue.prepareObserv(parseFloat(o)) for o in attr[pc])
-            else
-              attr[pc] = parseFloat(attr[pc])
-            # if we're dealing with OBSERV or MSRPOPL, set to undefined for empty value
-          else attr[pc] = undefined if pc == 'OBSERV'
-        else
+      populationSet = @measure.get('populations').at @model.get('population_index')
+      for pc of populationSet.get('populations')
+        # Only parse existing values
+        if @isNumbers && attr[pc]
+          attr[pc] = parseFloat(attr[pc])
+        else if pc != '_id'
           attr[pc] = if attr[pc] then 1 else 0 # Convert from check-box true/false to 0/1
+      if populationSet.has('observations') && @isMultipleObserv && attr['OBSERV']
+        attr['OBSERV'] = [].concat(attr['OBSERV'])
+        attr['OBSERV'] = (Thorax.Models.ExpectedValue.prepareObserv(parseFloat(o)) for o in attr['OBSERV'])
+      else
+        # if we're dealing with OBSERV, set to undefined for empty value
+        attr['OBSERV'] = undefined if 'OBSERV' in @measure.populationCriteria()
     'change input': 'selectPopulations'
     'change input[name="MSRPOPL"]': 'updateObserv'
     'change input[name="MSRPOPLEX"]': 'updateObserv'
@@ -85,10 +84,10 @@ class Thorax.Views.ExpectedValueView extends Thorax.Views.BuilderChildView
     @currentCriteria = []
     # get population criteria from the measure to include OBSERV
     population = @measure.get('populations').at @model.get('population_index')
-    @isNumbers = @measure.get('episode_of_care')
-    @isMultipleObserv = @measure.get('continuous_variable')
+    @isNumbers = @measure.get('calculation_method') == 'EPISODE_OF_CARE'
+    @isMultipleObserv = population.get('observations')?.length > 0
     @isCheckboxes = not @isNumbers and not @isMultipleObserv
-    for pc in @measure.populationCriteria() when population.has(pc)
+    for pc in @measure.populationCriteria() when population.has(pc) or pc == 'OBSERV' and population.has('observations')
       @currentCriteria.push
         key: pc
         displayName: pc
@@ -144,7 +143,7 @@ class Thorax.Views.ExpectedValueView extends Thorax.Views.BuilderChildView
 
   toggleMins: (e) ->
     if this.$('.btn-observ-unit-mins')[0].outerHTML.includes("btn-primary")
-       @model.set 'OBSERV_UNIT', ''
+      @model.set 'OBSERV_UNIT', ''
     else
       @model.set 'OBSERV_UNIT', ' mins'
     @updateObserv()

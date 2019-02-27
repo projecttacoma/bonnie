@@ -59,7 +59,7 @@ class Thorax.Views.DataCriteriaLogic extends Thorax.Views.BonnieView
     else
       ref.description
   translate_oid: (oid) =>
-    @measure.valueSets().findWhere({oid: oid})?.get('display_name')
+    _.find(@measure?.valueSets(), (vs) -> vs.oid is oid)?.display_name
 
   highlightEntry: (e) ->
     dataCriteriaKey = @dataCriteria.key

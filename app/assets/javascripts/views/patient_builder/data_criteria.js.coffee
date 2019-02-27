@@ -378,13 +378,13 @@ class Thorax.Views.EditCriteriaValueView extends Thorax.Views.BuilderChildView
             endDate += " #{attr.end_time}" if attr.end_time
             attr.locationPeriodHigh = endDate
             attr.end_value = moment.utc(endDate, 'L LT').format('X') * 1000
-            
+
       if attr.key == 'COMPONENT'
-        title_cmp = @measure?.valueSets().findWhere(oid: attr.code_list_id_cmp)?.get('display_name')
+        title_cmp = _.find(@measure?.valueSets(), (vs) -> vs.oid is attr.code_list_id_cmp)?.display_name
         attr.title = title_cmp if title_cmp
-        attr.title_cmp = @measure?.valueSets().findWhere(oid: attr.code_list_id)?.get('display_name')
+        attr.title_cmp = _.find(@measure?.valueSets(), (vs) -> vs.oid is attr.code_list_id)?.display_name
       else
-        title = @measure?.valueSets().findWhere(oid: attr.code_list_id)?.get('display_name')
+        title = _.find(@measure?.valueSets(), (vs) -> vs.oid is attr.code_list_id)?.display_name
         attr.title = title if title
       attr.codes = @fieldValueCodesCollection.toJSON() unless jQuery.isEmptyObject(@fieldValueCodesCollection.toJSON())
       # gets the pretty printed title (e.g., "Result Date/Time" instead of "RESULT_DATETIME")
@@ -440,7 +440,7 @@ class Thorax.Views.EditCriteriaValueView extends Thorax.Views.BuilderChildView
     return bonnie.isPortfolio and @fieldValue and key in ['PRINCIPAL_DIAGNOSIS', 'DIAGNOSIS'] and concepts and @$("select[name=type]").val() == "CD"
 
   getConcepts: (code_list_id) ->
-    return @measure?.valueSets().findWhere(oid: code_list_id)?.get('concepts')
+    return _.find(@measure?.valueSets(), (vs) -> vs.oid is code_list_id)?.concepts
 
   toggleAddCodesButton: ->
     attributes = @serialize(set: false)
