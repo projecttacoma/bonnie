@@ -66,16 +66,18 @@
         # Grab just the elm of the cql_library
         elm.push(cql_library.elm)
 
-      observations = cqm_measure.get('observations')
+      observations = cqm_measure.get('population_sets')[0].observations
       observation_defs = []
       if observations
         for obs in observations
-          generatedELMJSON = @generateELMJSONFunction(obs.function_name, obs.parameter)
+          funcName = obs.observation_function.statement_name
+          parameter = obs.observation_parameter.statement_name
+          generatedELMJSON = @generateELMJSONFunction(funcName, parameter)
           # Save the name of the generated define statement, so we can check
           # its result later in the CQL calculation process. These added
           # define statements are called 'BonnieFunction_' followed by the
           # name of the function - see the 'generateELMJSONFunction' function.
-          observation_defs.push('BonnieFunction_' + obs.function_name)
+          observation_defs.push('BonnieFunction_' + funcName)
           # Check to see if the gneratedELMJSON function is already in the definitions
           # Added a check to support old ELM representation and new Array representation.
           if Array.isArray(elm) && (elm[main_library_index]['library']['statements']['def'].filter (def) -> def.name == generatedELMJSON.name).length == 0
@@ -100,7 +102,7 @@
         population_relevance = {}
 
         # handle episode of care measure results
-        if cqm_measure.get('episode_of_care')
+        if cqm_measure.get('calculation_method') == 'EPISODE_OF_CARE'
           result.set {'episode_results': episode_results}
           # calculate relevance only if there were recorded episodes
           if Object.keys(episode_results).length > 0
@@ -150,7 +152,7 @@
     population_results = {}
     episode_results = null
     # patient based measure
-    if !population.collection.parent.get('episode_of_care')
+    if !(population.collection.parent.get('calculation_method') == 'EPISODE_OF_CARE')
       population_results = @handlePopulationValues(@createPatientPopulationValues(population, results, patient, observation_defs))
     else # episode of care based measure
       # collect results per episode
@@ -159,10 +161,9 @@
       # initialize population counts
       for popCode in Thorax.Models.Measure.allPopulationCodes
         if population.get(popCode)?
-          if popCode == 'OBSERV'
-            population_results.values = []
-          else
-            population_results[popCode] = 0
+          population_results[popCode] = 0
+        else if population.get('observations').length > 0
+          population_results.values = []
 
       # count up all population results for a patient level count
       for _, episode_result of episode_results
@@ -298,81 +299,68 @@
   ###
   createEpisodePopulationValues: (population, results, patient, observation_defs) ->
     episode_results = {}
-    # Grab the mapping between populations and CQL statements
-    cql_map = population.collection.parent.get('populations_cql_map')
-    # Loop over all population codes ("IPP", "DENOM", etc.) to deterine ones included in this population.
-    popCodesInPopulation = []
-    for popCode in Thorax.Models.Measure.allPopulationCodes
-      if population.get(popCode)?
-        popCodesInPopulation.push popCode
 
-    for popCode in popCodesInPopulation
-      if cql_map[popCode]
-        defined_pops = cql_map[popCode]
-
-        popIndex = population.getPopIndexFromPopName(popCode)
-        cql_population = defined_pops[popIndex]
+    for popCode, cqlPopulation of population.get('populations')
+      if popCode != '_id'
+        newEpisode = {}
         # Is there a patient result for this population? and does this populationCriteria contain the population
         # We need to check if the populationCriteria contains the population so that a STRAT is not set to zero if there is not a STRAT in the populationCriteria
-        if population.get(popCode)?
-          # Grab CQL result value and store for each episode found
-          values = results['patientResults'][patient.id][cql_population]
-          if Array.isArray(values)
-            for value in values
-              if value.id()?
-                # if an episode has already been created set the result for the population to 1
-                if episode_results[value.id().value]?
-                  episode_results[value.id().value][popCode] = 1
-
+        qdmDataElements = results['patientResults'][patient.id][cqlPopulation.statement_name]
+        if Array.isArray(qdmDataElements)
+          for element in qdmDataElements
+            if element.id()?
+              # if an episode has already been created set the result for the population to 1
+              if episode_results[element.id().value]?
+                episode_results[element.id().value][popCode] = 1
                 # else create a new episode using the list of all popcodes for the population
-                else
-                  newEpisode = { }
-                  for pop in popCodesInPopulation
-                    newEpisode[pop] = 0 unless pop == 'OBSERV'
-                  newEpisode[popCode] = 1
-                  episode_results[value.id().value] = newEpisode
-          else
-            console.log('WARNING: CQL Results not an array') if console?
-      else if popCode == 'OBSERV' && observation_defs?.length > 0
-        # Handle observations using the names of the define statements that
-        # were added to the ELM to call the observation functions.
-        for ob_def in observation_defs
-          # Observations only have one result, based on how the HQMF is
-          # structured (note the single 'value' section in the
-          # measureObservationDefinition clause).
-          obs_results = results['patientResults']?[patient.id]?[ob_def]
-
-          for obs_result in obs_results
-            result_value = null
-            episodeId = obs_result.episode.id().value
-            # Add the single result value to the values array on the results of
-            # this calculation (allowing for more than one possible observation).
-            if obs_result?.hasOwnProperty('value')
-              # If result is a cql.Quantity type, add its value
-              result_value = obs_result.observation.value
-            else
-              # In all other cases, add result
-              result_value = obs_result.observation
-
-            # if the episode_result object already exist create or add to to the values structure
-            if episode_results[episodeId]?
-              if episode_results[episodeId].values?
-                episode_results[episodeId].values.push(result_value)
               else
-                episode_results[episodeId].values = [result_value]
-            # else create a new episode_result structure
-            else
-              newEpisode = { }
-              for pop in popCodesInPopulation
-                newEpisode[pop] = 0 unless pop == 'OBSERV'
-              newEpisode.values = [result_value]
-              episode_results[episodeId] = newEpisode
-      else if popCode == 'OBSERV' && observation_defs?.length <= 0
-        console.log('WARNING: No function definition injected for OBSERV') if console?
+                newEpisode = {}
+                for pop of population.get('populations')
+                  newEpisode[pop] = 0 unless pop == 'OBSERV' || pop == '_id'
+                newEpisode[popCode] = 1
+                episode_results[element.id().value] = newEpisode
+        else
+          console.log('WARNING: CQL Results not an array') if console?
+    if observation_defs?.length > 0 
+      # Handle observations using the names of the define statements that
+      # were added to the ELM to call the observation functions.
+      for ob_def in observation_defs
+        # Observations only have one result, based on how the HQMF is
+        # structured (note the single 'value' section in the
+        # measureObservationDefinition clause).
+        obs_results = results['patientResults']?[patient.id]?[ob_def]
+        for obs_result in obs_results
+          result_value = null
+          episodeId = obs_result.episode.id().value
+          # Add the single result value to the values array on the results of
+          # this calculation (allowing for more than one possible observation).
+          if obs_result?.hasOwnProperty('value')
+            # If result is a cql.Quantity type, add its value
+            result_value = obs_result.observation.value
+          else
+            # In all other cases, add result
+            result_value = obs_result.observation
 
+          # if the episode_result object already exist create or add to to the values structure
+          if episode_results[episodeId]?
+            if episode_results[episodeId].values?
+              episode_results[episodeId].values.push(result_value)
+            else
+              episode_results[episodeId].values = [result_value]
+          # else create a new episode_result structure
+          else
+            newEpisode = { }
+            for pop of population.get('populations')
+              newEpisode[pop] = 0 unless pop == 'OBSERV' || pop == '_id'
+            newEpisode.values = [result_value]
+            episode_results[episodeId] = newEpisode
+    else if popCode == 'OBSERV' && observation_defs?.length <= 0
+      console.log('WARNING: No function definition injected for OBSERV') if console?
+
+    # Correct any inconsistencies. ex. In DENEX but also in NUMER using same function used for patients.
     for episodeId, episode_result of episode_results
       # ensure that an empty 'values' array exists for continuous variable measures if there were no observations
-      if 'OBSERV' in popCodesInPopulation
+      if 'OBSERV' in population.get('populations')
         if !episode_result.values
           episode_result.values = []
 

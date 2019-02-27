@@ -10,8 +10,8 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
       if @model.get('type') is 'eh' then 'Eligible Hospital (EH)'
       else if @model.get('type') is 'ep' then 'Eligible Professional (EP)'
     calculationTypeLabel = if @model?
-      if @model.get('episode_of_care') is false and @model.get('continuous_variable') is false then 'Patient Based'
-      else if @model.get('episode_of_care') is true then 'Episode of Care'
+      if (@model.get('calculation_method') == 'EPISODE_OF_CARE') is false and @model.get('continuous_variable') is false then 'Patient Based'
+      else if (@model.get('calculation_method') == 'EPISODE_OF_CARE') is true then 'Episode of Care'
       else if @model.get('continuous_variable') is true then 'Continuous Variable'
     calcSDEs = @model.get('calculate_sdes') if @model?
     currentRoute = Backbone.history.fragment
@@ -31,7 +31,7 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
 
   events:
     rendered: ->
-      @$("option[value=\"#{eoc}\"]").attr('selected','selected') for eoc in @model.get('episode_ids') if @model? && @model.get('episode_of_care') && @model.get('episode_ids')?
+      @$("option[value=\"#{eoc}\"]").attr('selected','selected') for eoc in @model.get('episode_ids') if @model? && (@model.get('calculation_method') == 'EPISODE_OF_CARE') && @model.get('episode_ids')?
       @$el.on 'hidden.bs.modal', -> @remove() unless $('#pleaseWaitDialog').is(':visible')
       @$("input[type=radio]:checked").next().css("color","white")
       # start load of profile names

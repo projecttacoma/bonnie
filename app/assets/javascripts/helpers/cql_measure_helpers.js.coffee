@@ -325,6 +325,7 @@ class CQLMeasureHelpers
           clonedSet = @deepCopyPopulationSet(populationSet)
           clonedSet.population_set_id = stratification.stratification_id
           clonedSet.populations.STRAT = stratification.statement
+          clonedSet.title = stratification.title
           stratificationsAsPopulationSets.push clonedSet
     return stratificationsAsPopulationSets
 

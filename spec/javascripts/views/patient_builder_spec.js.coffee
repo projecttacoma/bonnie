@@ -2,10 +2,10 @@ describe 'PatientBuilderView', ->
 
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
-    @measure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS134/CMS134v6.json'), parse: true
+    @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS134/CMS134v6.json'), parse: true
     @patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS134/patients.json'), parse: true
     @patient = @patients.models[1]
-    bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS134/value_sets.json')
+    bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS134/value_sets.json')
     @bonnie_measures_old = bonnie.measures
     bonnie.measures = new Thorax.Collections.Measures()
     bonnie.measures.add @measure
@@ -411,8 +411,8 @@ describe 'PatientBuilderView', ->
 
   describe "setting expected values for CV measure", ->
     beforeEach ->
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS32/value_sets.json')
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS32/value_sets.json')
       patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
       @patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
       @patientBuilder.appendTo 'body'
@@ -490,6 +490,7 @@ describe 'PatientBuilderView', ->
 
     afterEach -> @patientBuilder.remove()
 
+  # TODO Need to update or replace this fixture
   describe 'CQL', ->
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()
@@ -530,8 +531,8 @@ describe 'PatientBuilderView', ->
       expect(editFieldValueView.$('label[for=referenceRangeHigh]').length).toEqual(0)
 
     it "EditCriteriaValueView does not have duplicated codes in dropdown", ->
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/CQL/CMS107/value_sets.json')
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/CQL/CMS107/CMS107v6.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/CQL/CMS107/value_sets.json')
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/CQL/CMS107/CMS107v6.json'), parse: true
       bonnie.measures.add(cqlMeasure, { parse: true })
       patients = new Thorax.Collections.Patients getJSONFixture('records/CQL/CMS107/patients.json'), parse: true
       patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
@@ -550,8 +551,8 @@ describe 'PatientBuilderView', ->
       expect(codesInDropdown['Dead']).toBeDefined()
 
     it "EditCriteriaValueView allows for input field validation to happen on change event", ->
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS160/value_sets.json')
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
       bonnie.measures = new Thorax.Collections.Measures()
       bonnie.measures.add(cqlMeasure, { parse: true })
       patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS160/patients.json'), parse: true
@@ -579,8 +580,8 @@ describe 'PatientBuilderView', ->
       # This is sort of a test for coverage sake more than the actual expected
       # behavior, but can serve as an example of how to reproduce these
       # conditions for future investigation
-      cqlMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS160/value_sets.json')
+      cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS160/value_sets.json')
       # If bonnie.measures = new Thorax.Collections.Measures() is called here,
       # no WARNING: missing value set message will be shown
       bonnie.measures.add(cqlMeasure, { parse: true })
@@ -591,6 +592,7 @@ describe 'PatientBuilderView', ->
       editCriteriaView = new Thorax.Views.EditCriteriaView(model: assessmentPerformed, measure: cqlMeasure)
       expect(console.log).toHaveBeenCalledWith('WARNING: missing value set')
 
+  # TODO Need to update or replace this fixture
   describe 'Composite Measure', ->
 
     beforeEach ->
@@ -652,8 +654,8 @@ describe 'Direct Reference Code Usage', ->
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
     @oldBonnieValueSetsByOid = bonnie.valueSetsByOid
-    bonnie.valueSetsByOid = getJSONFixture('measure_data/core_measures/CMS32/value_sets.json')
-    @measure = new Thorax.Models.Measure getJSONFixture('measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
+    bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS32/value_sets.json')
+    @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
     bonnie.measures.add(@measure, { parse: true })
     @patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
 
@@ -686,8 +688,8 @@ describe 'Allergy Intolerance', ->
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
     @universalValueSetsByOid = bonnie.valueSetsByOid
-    bonnie.valueSetsByOid = getJSONFixture("measure_data/special_measures/CMS12v0/value_sets.json")
-    @measure = new Thorax.Models.Measure getJSONFixture("measure_data/special_measures/CMS12v0/CMS12v0.json"), parse: true
+    bonnie.valueSetsByOid = getJSONFixture("cqm_measure_data/special_measures/CMS12v0/value_sets.json")
+    @measure = new Thorax.Models.Measure getJSONFixture("cqm_measure_data/special_measures/CMS12v0/CMS12v0.json"), parse: true
     bonnie.measures.add @measure
     @patients = new Thorax.Collections.Patients getJSONFixture("records/special_measures/CMS12v0/patients.json"), parse: true
     @patient = @patients.findWhere(first: "MedAllergyEndIP", last: "DENEXCEPPass")

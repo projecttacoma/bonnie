@@ -27,7 +27,7 @@ class Thorax.Views.PopulationCalculation extends Thorax.Views.BonnieView
     _(difference.toJSON()).extend
       patient: difference.result.patient.toJSON()
       measure_id: @measure.get('hqmf_set_id')
-      episode_of_care: @measure.get('episode_of_care')
+      episode_of_care: @measure.get('calculation_method') == 'EPISODE_OF_CARE'
 
   updatePopulation: (population) ->
     selectedResult = @$('.toggle-result').filter(':visible').model().result
