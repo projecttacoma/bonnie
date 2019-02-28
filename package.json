@@ -109,8 +109,7 @@
   },
   "dependencies": {
     "browserify": "^16.2.3",
-    "cqm-execution": "https://github.com/projecttacoma/cqm-execution#mongoose_browser",
-    "cqm-models": "https://github.com/projecttacoma/cqm-models#no-models",
-    "mongoose": "^5.4.6"
+    "cqm-execution": "https://github.com/projecttacoma/cqm-execution#master",
+    "cqm-models": "https://github.com/projecttacoma/cqm-models#master"
   }
 }
