@@ -34,9 +34,8 @@ class Thorax.Models.Measure extends Thorax.Model
     # ignoring versions for diplay names
     oid_display_name_map = {}
     if bonnie.valueSetsByOid?
-      for oid, versions of bonnie.valueSetsByOid[attrs.hqmf_set_id]
-        for version, vs of versions
-          oid_display_name_map[oid] = vs.display_name if vs?.display_name
+      for valSet in bonnie.valueSetsByOid[attrs.hqmf_set_id]
+        oid_display_name_map[valSet.oid] = valSet.display_name if valSet?.display_name
 
     for key, data_criteria of attrs.data_criteria
       data_criteria.key = key
@@ -71,7 +70,10 @@ class Thorax.Models.Measure extends Thorax.Model
   populationCriteria: -> _.intersection(Thorax.Models.Measure.allPopulationCodes, _(@get('population_criteria')).map (p) -> p.type)
 
   valueSets: ->
-    bonnie.valueSetsByOid[@get('hqmf_set_id')]
+    valSets = []
+    if bonnie.valueSetsByOid?
+      valSets = bonnie.valueSetsByOid[@get('hqmf_set_id')]
+    valSets
 
   hasCode: (code, code_system) ->
     for vs in @valueSets()
