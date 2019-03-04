@@ -89,7 +89,9 @@
       elm = @setValueSetVersionsToUndefined(elm)
 
       # Grab the correct version of value sets to pass into the exectuion engine.
-      measure_value_sets = @valueSetsForCodeService(bonnie.valueSetsByOid[cqm_measure.get('hqmf_set_id')], cqm_measure.get('hqmf_set_id'))
+      valueSets = []
+      valueSets = bonnie.valueSetsByOid[cqm_measure.get('hqmf_set_id')] if bonnie.valueSetsByOid?
+      measure_value_sets = @valueSetsForCodeService(valueSets, cqm_measure.get('hqmf_set_id'))
 
       # Calculate results for each CQL statement
       results = executeSimpleELM(elm, patientSource, measure_value_sets, cqm_measure.get('main_cql_library'), main_library_version, executionDateTime, params)

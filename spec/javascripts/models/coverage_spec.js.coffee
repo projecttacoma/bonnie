@@ -1,5 +1,6 @@
 describe 'Coverage', ->
 
+  # TODO Need to update or replace this fixture
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
     bonnie.measures = new Thorax.Collections.Measures()
