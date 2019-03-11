@@ -39,6 +39,7 @@ Layout/AlignHash:
   Exclude:
     - 'app/controllers/measures_controller.rb'
     - 'app/mailers/admin/users_mailer.rb'
+    - 'config/environments/production.rb'
     - 'lib/measures/ade_helper.rb'
     - 'test/functional/patients_controller_test.rb'
     - 'test/functional/registrations_controller_test.rb'
@@ -76,7 +77,10 @@ Layout/CommentIndentation:
     - 'app/models/user.rb'
     - 'lib/measures/patient_builder.rb'
 
-# Offense count: 4
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+# Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: AllowAdjacentOneLineDefs, NumberOfEmptyLines.
 Layout/EmptyLineBetweenDefs:
@@ -135,6 +139,24 @@ Layout/EmptyLinesAroundMethodBody:
   Exclude:
     - 'app/controllers/patients_controller.rb'
     - 'lib/measures/patient_builder.rb'
+
+# Offense count: 6
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: empty_lines, empty_lines_except_namespace, empty_lines_special, no_empty_lines
+Layout/EmptyLinesAroundModuleBody:
+  Exclude:
+    - 'app/helpers/application_helper.rb'
+    - 'lib/bonnie_backend_measure_javascript.rb'
+    - 'lib/bonnie_measure_javascript.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyleAlignWith, AutoCorrect.
+# SupportedStylesAlignWith: keyword, variable, start_of_line
+Layout/EndAlignment:
+  Exclude:
+    - 'test/functional/valuesets_controller_test.rb'
 
 # Offense count: 23
 # Cop supports --auto-correct.
@@ -496,6 +518,8 @@ Lint/UselessAssignment:
     - 'lib/tasks/bonnie_run_once.rake'
     - 'lib/tasks/cql.rake'
     - 'test/functional/measures_controller_test.rb'
+    - 'test/functional/api_v1/measures_controller_backend_calc_test.rb'
+    - 'app/controllers/api_v1/measures_controller.rb'
     - 'test/unit/helpers/excel_export_helper_test.rb'
 
 # Offense count: 1
@@ -586,15 +610,11 @@ Performance/CompareWithBlock:
   Exclude:
     - 'test/unit/helpers/excel_export_helper_test.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: AutoCorrect.
-Performance/HashEachMethods:
+# Offense count: 1
+# Configuration parameters: AllowedChars.
+Style/AsciiComments:
   Exclude:
-    - 'app/controllers/patients_controller.rb'
-    - 'lib/measures/patient_builder.rb'
-    - 'lib/patient_export.rb'
-    - 'lib/tasks/bonnie.rake'
+    - 'test/test_helper.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -934,12 +954,7 @@ Style/RedundantParentheses:
 # Cop supports --auto-correct.
 # Configuration parameters: AllowMultipleReturnValues.
 Style/RedundantReturn:
-  Exclude:
-    - 'app/controllers/registrations_controller.rb'
-    - 'lib/patient_export.rb'
-    - 'lib/tasks/bonnie.rake'
-    - 'lib/util/fixture_exporter.rb'
-    - 'lib/version.rb'
+  Enabled: false
 
 # Offense count: 12
 # Cop supports --auto-correct.
