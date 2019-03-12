@@ -7,9 +7,9 @@ class Thorax.Views.MeasureLayout extends Thorax.LayoutView
 
   context: ->
     _(super).extend
-      cms_id: @measure.get 'cms_id'
-      hqmf_set_id: @measure.get 'hqmf_set_id'
-      cql: @measure.has('cql_libraries') # Hide certain features in handlebars if the measure is cql.
+      cms_id: @measure.get('cqmMeasure').cms_id
+      hqmf_set_id: @measure.get('cqmMeasure').hqmf_set_id
+      cql: true # Hide certain features in handlebars if the measure is cql.
 
   # Navigates to the Patient Dashboard
   showDashboard: (showFixedColumns) ->
@@ -64,7 +64,7 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
    # @complexityView = new Thorax.Views.MeasureComplexity model: @model
    # @complexityView.listenTo @logicView, 'population:update', (population) -> @updatePopulation(population)
 
-    @valueSetsView = new Thorax.Views.MeasureValueSets model: @model
+    pView = new Thorax.Views.MeasureValueSets model: @model
 
     @populationCalculation = new Thorax.Views.PopulationCalculation(model: @population, isCQL: @model.get('cql')?)
     @logicView.listenTo @populationCalculation, 'logicView:showCoverage', -> @showCoverage()
@@ -111,7 +111,7 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
     calc_results = {}
     patient_details = {}
     population_details = {}
-    statement_details = CQLMeasureHelpers.buildDefineToFullStatement(@model)
+    statement_details = CQLMeasureHelpers.buildDefineToFullStatement(@model.get('cqmMeasure'))
     file_name = @model.get('cms_id')
     # Loop iterates over the populations and gets the calculations for each population.
     # From this it builds a map of pop_key->patient_key->results

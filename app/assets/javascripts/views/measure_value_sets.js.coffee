@@ -6,6 +6,7 @@ class Thorax.Views.MeasureValueSets extends Thorax.Views.BonnieView
     @terminology = new Thorax.Collections.ValueSetsCollection([], sorting: 'complex') # all value set names, OID, and versions
     @overlappingValueSets = new Thorax.Collections.ValueSetsCollection([]) # all value sets that overlap
     @overlappingValueSets.comparator = (vs) -> [vs.get('name1'), vs.get('oid1')]
+    @cqmMeasure = @model.get('cqmMeasure')
 
     # options passed to a Backbone.PageableCollection instance
     @pagination_options =
@@ -30,13 +31,13 @@ class Thorax.Views.MeasureValueSets extends Thorax.Views.BonnieView
       oid_version = ''
       version = ''
     else
-      oid_version = _.find(bonnie.valueSetsByOid[@model.get('hqmf_set_id')], (oid_version) -> oid_version.oid == oid)
+      oid_version = _.find(bonnie.valueSetsByOid[@cqmMeasure.hqmf_set_id], (oid_version) -> oid_version.oid == oid)
       if oid_version?
         version = oid_version.version
       else
         version = ''
 
-    val_set = _.find(bonnie.valueSetsByOid[@model.get('hqmf_set_id')], (val_set) -> val_set.oid == oid)
+    val_set = _.find(bonnie.valueSetsByOid[@cqmMeasure.hqmf_set_id], (val_set) -> val_set.oid == oid)
     if val_set?
       if val_set.version == version
         codeConcepts = val_set.concepts ? []
@@ -63,11 +64,11 @@ class Thorax.Views.MeasureValueSets extends Thorax.Views.BonnieView
   getValueSets: ->
     terminology = []
 
-    if @model.get('cql_libraries')
-      @model.get('cql_libraries').forEach (library) =>
+    if @cqmMeasure.cql_libraries
+      @cqmMeasure.cql_libraries.forEach (library) =>
         # Direct Reference Codes
         drc_guids_and_names = {}
-        for value in bonnie.valueSetsByOid[@model.get('hqmf_set_id')]
+        for value in bonnie.valueSetsByOid[@cqmMeasure.hqmf_set_id]
           if ValueSetHelpers.isDirectReferenceCode(value.oid)
             drc_guids_and_names[value.oid] = value['display_name']
 

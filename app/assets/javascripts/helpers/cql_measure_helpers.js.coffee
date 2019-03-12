@@ -12,7 +12,7 @@ class CQLMeasureHelpers
   ###
   @buildDefineToFullStatement: (measure) ->
     ret = {}
-    for lib in measure.get("cql_libraries")
+    for lib in measure.cql_libraries
       lib_statements = {}
       for statement in lib.elm_annotations.statements
         lib_statements[statement.define_name] = @_parseAnnotationTree(statement.children)
@@ -45,7 +45,7 @@ class CQLMeasureHelpers
   # @param {string} statementName - The statement name to search for.
   # @return {Hash} List of local ids in the statement.
   ###
-  @findAllLocalIdsInStatementByName: (measure, libraryName, statementName) ->
+  @findAllLocalIdsInStatementByName: (cqmMeasure, libraryName, statementName) ->
     # create place for aliases and their usages to be placed to be filled in later. Aliases and their usages (aka scope)
     # and returns do not have localIds in the elm but do in elm_annotations at a consistent calculable offset.
     # BE WEARY of this calaculable offset.
@@ -54,7 +54,7 @@ class CQLMeasureHelpers
     # find the library and statement in the elm.
     library = null
     statement = null
-    for lib in measure.get('cql_libraries')
+    for lib in cqmMeasure.cql_libraries
       if lib.library_name == libraryName
         library = lib
     for curStatement in library.elm.library.statements.def
@@ -286,12 +286,11 @@ class CQLMeasureHelpers
   ###*
   # Figure out if a statement is a function given the measure, library name and statement name.
   # @public
-  # @param {Measure} measure - The measure to find localIds in.
   # @param {string} libraryName - The name of the library the statement belongs to.
   # @param {string} statementName - The statement name to search for.
   # @return {boolean} If the statement is a function or not.
   ###
-  @isStatementFunction: (measure, library, statementName) ->
+  @isStatementFunction: (library, statementName) ->
     # find the library and statement in the elm.
     statement = null
     for curStatement in library.elm.library.statements.def
@@ -310,8 +309,9 @@ class CQLMeasureHelpers
   # @param {string} statementDefine - The statement define to search for.
   # @return {boolean} Statement does or does not belong to a Supplemental Data Element.
   ###
-  @isSupplementalDataElementStatement: (population, statementDefine) ->
-    return _.contains(population.get('supplemental_data_elements'), statementDefine)
+  @isSupplementalDataElementStatement: (supplementalDataElements, statementDefine) ->
+    #return _.contains(supplementalDataElements, statementDefine)
+    return Array.isArray(supplementalDataElements) && (supplementalDataElements?.filter (d) -> d.statement_name is statementDefine).length > 0
 
   ###*
   # Format stratifications as population sets to be added to the measure's population sets
