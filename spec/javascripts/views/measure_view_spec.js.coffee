@@ -39,9 +39,9 @@
       expect(bonnie.showPageNotFound).toHaveBeenCalled()
 
     it 'renders measure details', ->
-      expect(@measureView.$el).toContainText @measure.get('title')
-      expect(@measureLayoutView.$el).toContainText @measure.get('cms_id')
-      expect(@measureView.$el).toContainText @measure.get('description')
+      expect(@measureView.$el).toContainText @measure.get('cqmMeasure').title
+      expect(@measureLayoutView.$el).toContainText @measure.get('cqmMeasure').cms_id
+      expect(@measureView.$el).toContainText @measure.get('cqmMeasure').description
 
     it 'renders measure populations', ->
       expect(@measureView.$('[data-toggle="tab"]')).toExist()

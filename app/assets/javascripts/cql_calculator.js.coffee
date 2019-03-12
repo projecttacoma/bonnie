@@ -36,11 +36,12 @@
       # Necessary structure for the CQL (ELM) Execution Engine. Uses CQL_QDM Patient API to map Bonnie patients to correct format.
       patientSource = new PatientSource([patient])
 
-      cqm_measure = population.collection.parent
+      thorax_measure = population.collection.parent
+      cqm_measure = thorax_measure.get('cqmMeasure')
 
       # Grab start and end of Measurement Period
-      start = @getConvertedTime cqm_measure.get('measure_period').low.value
-      end = @getConvertedTime cqm_measure.get('measure_period').high.value
+      start = @getConvertedTime cqm_measure.measure_period.low.value
+      end = @getConvertedTime cqm_measure.measure_period.high.value
       start_cql = cql.DateTime.fromJSDate(start, 0) # No timezone offset for start
       end_cql = cql.DateTime.fromJSDate(end, 0) # No timezone offset for stop
 
@@ -51,7 +52,7 @@
       params = {"Measurement Period": new cql.Interval(start_cql, end_cql)}
 
       # Grab ELM JSON from measure, use clone so that the function added from observations does not get added over and over again
-      cql_libraries = _.clone(cqm_measure.get('cql_libraries'))
+      cql_libraries = _.clone(cqm_measure.cql_libraries)
 
       main_library_version = ''
       main_library_index = 0
@@ -66,7 +67,7 @@
         # Grab just the elm of the cql_library
         elm.push(cql_library.elm)
 
-      observations = cqm_measure.get('population_sets')[0].observations
+      observations = cqm_measure.population_sets[0].observations
       observation_defs = []
       if observations
         for obs in observations
@@ -90,11 +91,11 @@
 
       # Grab the correct version of value sets to pass into the exectuion engine.
       valueSets = []
-      valueSets = bonnie.valueSetsByOid[cqm_measure.get('hqmf_set_id')] if bonnie.valueSetsByOid?
-      measure_value_sets = @valueSetsForCodeService(valueSets, cqm_measure.get('hqmf_set_id'))
+      valueSets = bonnie.valueSetsByOid[cqm_measure.hqmf_set_id] if bonnie.valueSetsByOid?
+      measure_value_sets = @valueSetsForCodeService(valueSets, cqm_measure.hqmf_set_id)
 
       # Calculate results for each CQL statement
-      results = executeSimpleELM(elm, patientSource, measure_value_sets, cqm_measure.get('main_cql_library'), main_library_version, executionDateTime, params)
+      results = executeSimpleELM(elm, patientSource, measure_value_sets, cqm_measure.main_cql_library, main_library_version, executionDateTime, params)
 
       # Parse CQL statement results into population values
       [population_results, episode_results] = @createPopulationValues population, results, patient, observation_defs
@@ -104,7 +105,7 @@
         population_relevance = {}
 
         # handle episode of care measure results
-        if cqm_measure.get('calculation_method') == 'EPISODE_OF_CARE'
+        if cqm_measure.calculation_method == 'EPISODE_OF_CARE'
           result.set {'episode_results': episode_results}
           # calculate relevance only if there were recorded episodes
           if Object.keys(episode_results).length > 0
@@ -122,8 +123,8 @@
 
         result.set {'population_relevance': population_relevance }
         # Add 'statement_relevance', 'statement_results' and 'clause_results' generated in the CQLResultsHelpers class.
-        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, cqm_measure, cqm_measure.get('displayedPopulation'))}
-        result.set CQLResultsHelpers.buildStatementAndClauseResults(cqm_measure, results.localIdPatientResultsMap[patient['id']], result.get('statement_relevance'), !!options['doPretty'])
+        result.set {'statement_relevance': CQLResultsHelpers.buildStatementRelevanceMap(population_relevance, cqm_measure, population)}
+        result.set CQLResultsHelpers.buildStatementAndClauseResults(thorax_measure, results.localIdPatientResultsMap[patient['id']], result.get('statement_relevance'), !!options['doPretty'])
 
         result.set {'patient_id': patient['id']} # Add patient_id to result in order to delete patient from population_calculation_view
         result.state = 'complete'
@@ -248,9 +249,10 @@
   ###
   createPatientPopulationValues: (population, results, patient, observation_defs) ->
     population_results = {}
+    cqmMeasure = population.collection.parent.get('cqmMeasure')
     # Grab the correct expected for this population
     populationIndex = population.get('index')
-    measureId = population.collection.parent.get('hqmf_set_id')
+    measureId = cqmMeasure.hqmf_set_id
     expected = patient.get('expected_values').findWhere(measure_id: measureId, population_index: populationIndex)
     # Loop over all population codes ("IPP", "DENOM", etc.)
     for popCode in Thorax.Models.Measure.allPopulationCodes
@@ -260,7 +262,7 @@
         if population.get(popCode)?
           # Grab CQL result value and adjust for Bonnie
           # TODO Handle mutliple population sets
-          value = results['patientResults'][patient.id][population.collection.parent.get('population_sets')[0].populations[popCode].statement_name]
+          value = results['patientResults'][patient.id][cqmMeasure.population_sets[0].populations[popCode].statement_name]
           if Array.isArray(value) and value.length > 0
             population_results[popCode] = value.length
           else if typeof value is 'boolean' and value

@@ -3,7 +3,7 @@
     <div class="measure-title">
       {{!-- This really just needs to be bold --}}
       <span class="short-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Measure details</span>
-      {{#if component}}
+      {{#if cqmMeasure.component}}
         <span class="settings-container">
           <div class="measure-settings">
             <a data-title="Component measures must be updated via their composite measure." data-toggle="tooltip" data-placement="bottom">
@@ -28,16 +28,16 @@
       {{/if}}
     </div>
     <div class="measure-dsp">
-      <h2 class="full-title">{{title}}</h2>
-      {{#if episode_of_care}}
+      <h2 class="full-title">{{cqmMeasure.title}}</h2>
+      {{#ifCond cqmMeasure.calculation_method '==' 'EPISODE_OF_CARE'}}
         Episode of Care Based Measure
         <p></p>
-      {{/if}}
-      {{#if calculate_sdes}}
+      {{/ifCond}}
+      {{#if cqmMeasure.calculate_sdes}}
           <p>Include Supplemental Data Element Calculations</p>
       {{/if}}
 
-      <p>{{description}}</p>
+      <p>{{cqmMeasure.description}}</p>
 
       {{view complexityView}}
 

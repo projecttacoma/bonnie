@@ -165,24 +165,25 @@ class CQLResultsHelpers
   # @param {boolean} doPretty - If true, also generate pretty versions of result.
   # @returns {object} Object with the statement_results and clause_results structures, keyed as such.
   ###
-  @buildStatementAndClauseResults: (measure, rawClauseResults, statementRelevance, doPretty = false) ->
+  @buildStatementAndClauseResults: (thoraxMeasure, rawClauseResults, statementRelevance, doPretty = false) ->
     statementResults = {}
     clauseResults = {}
     emptyResultClauses = []
-    for library in measure.get('cql_libraries')
+    cqmMeasure = thoraxMeasure.get('cqmMeasure')
+    for library in cqmMeasure.cql_libraries
       statementResults[library.library_name] = {}
       clauseResults[library.library_name] = {}
       for statement in library.statement_dependencies
-        rawStatementResult = @_findResultForStatementClause(measure, library.library_name, statement.statement_name, rawClauseResults)
+        rawStatementResult = @_findResultForStatementClause(cqmMeasure, library.library_name, statement.statement_name, rawClauseResults)
         statementResults[library.library_name][statement.statement_name] = { raw: rawStatementResult}
-        isSDE = CQLMeasureHelpers.isSupplementalDataElementStatement(measure.get('populations').first(), statement.statement_name)
-        if (!measure.get('calculate_sdes') && isSDE) || statementRelevance[library.library_name][statement.statement_name] == 'NA'
+        isSDE = CQLMeasureHelpers.isSupplementalDataElementStatement(cqmMeasure.population_sets[0].get('supplemental_data_elements'), statement.statement_name)
+        if (!cqmMeasure.calculate_sdes && isSDE) || statementRelevance[library.library_name][statement.statement_name] == 'NA'
           statementResults[library.library_name][statement.statement_name].final = 'NA'
           statementResults[library.library_name][statement.statement_name].pretty = 'NA' if doPretty
         else if statementRelevance[library.library_name][statement.statement_name] == 'FALSE' || !rawClauseResults[library.library_name]?
           statementResults[library.library_name][statement.statement_name].final = 'UNHIT'
           # even if the statement wasn't hit, we want the pretty result to just be FUNCTION for functions
-          if CQLMeasureHelpers.isStatementFunction(measure, library, statement.statement_name)
+          if CQLMeasureHelpers.isStatementFunction(library, statement.statement_name)
             statementResults[library.library_name][statement.statement_name].pretty = "FUNCTION" if doPretty
           else
             statementResults[library.library_name][statement.statement_name].pretty = 'UNHIT' if doPretty
@@ -195,13 +196,13 @@ class CQLResultsHelpers
             if rawStatementResult instanceof Array && rawStatementResult.length == 0
               # Special case, handle empty array.
               statementResults[library.library_name][statement.statement_name].pretty = "FALSE ([])" if doPretty
-            else if CQLMeasureHelpers.isStatementFunction(measure, library, statement.statement_name)
+            else if CQLMeasureHelpers.isStatementFunction(library, statement.statement_name)
               statementResults[library.library_name][statement.statement_name].pretty = "FUNCTION" if doPretty
             else
               statementResults[library.library_name][statement.statement_name].pretty = "FALSE (#{rawStatementResult})" if doPretty
 
         # create clause results for all localIds in this statement
-        localIds = measure.findAllLocalIdsInStatementByName(library.library_name, statement.statement_name)
+        localIds = thoraxMeasure.findAllLocalIdsInStatementByName(library.library_name, statement.statement_name)
         for localId, clause of localIds
           clauseResult =
             # if this clause is an alias or a usage of alias it will get the raw result from the sourceLocalId.
@@ -304,16 +305,16 @@ class CQLResultsHelpers
   ###*
   # Finds the clause localId for a statement and gets the raw result for it from the raw clause results.
   # @private
-  # @param {Measure} measure - The measure.
+  # @param {cqmMeasure} measure - The measure.
   # @param {string} libraryName - The library name.
   # @param {string} statementName - The statement name.
   # @param {object} rawClauseResults - The raw clause results from the engine.
   # @returns {(Array|object|Interval|??)} The raw result from the calculation engine for the given statement.
   ###
-  @_findResultForStatementClause: (measure, libraryName, statementName, rawClauseResults) ->
+  @_findResultForStatementClause: (cqmMeasure, libraryName, statementName, rawClauseResults) ->
     library = null
     statement = null
-    for lib in measure.get('cql_libraries')
+    for lib in cqmMeasure.cql_libraries
       if lib.elm.library.identifier.id == libraryName
         library = lib
     for curStatement in library.elm.library.statements.def
