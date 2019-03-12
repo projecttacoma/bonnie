@@ -14,8 +14,8 @@ describe 'MeasuresView', ->
 
   it 'renders dashboard', ->
     expect(@measuresView.$('.measure').length).toBe @measures.length
-    expect(@measuresView.$el).toContainText @measure.get('cms_id')
-    expect(@measuresView.$el).toContainText @measure.get('title')
+    expect(@measuresView.$el).toContainText @measure.get('cqmMeasure').cms_id
+    expect(@measuresView.$el).toContainText @measure.get('cqmMeasure').title
     expect(@measuresView.$('.patient-listing-col > a').length).toBe @measures.length
 
   it 'renders measures with populations on dashboard', ->
@@ -33,12 +33,12 @@ describe 'MeasuresView', ->
     beforeEach ->
       jasmine.getJSONFixtures().clearCache()
       @universalValueSetsByOid = bonnie.valueSetsByOid
-      bonnie.valueSetsByOid = getJSONFixture('measure_data/special_measures/CMS890/value_sets.json')
+      bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/special_measures/CMS890/value_sets.json')
       bonnie.measures = new Thorax.Collections.Measures()
-      @compositeMeasure = new Thorax.Models.Measure getJSONFixture('measure_data/special_measures/CMS890/CMS890v0.json'), parse: true
+      @compositeMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/special_measures/CMS890/CMS890v0.json'), parse: true
       bonnie.measures.push(@compositeMeasure)
 
-      @components = getJSONFixture('measure_data/special_measures/CMS890/components.json')
+      @components = getJSONFixture('cqm_measure_data/special_measures/CMS890/components.json')
       @components = @components.map((component) => new Thorax.Models.Measure component, parse: true)
       @components.forEach((component) => bonnie.measures.push(component))
 
