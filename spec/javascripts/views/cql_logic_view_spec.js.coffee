@@ -37,7 +37,7 @@ describe 'CqlLogicView', ->
       populationLogicView = new Thorax.Views.CqlPopulationLogic(model: @cqlMeasure, highlightPatientDataEnabled: true, population: population)
       populationLogicView.render()
 
-      testPatients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
+      testPatients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32/patients.json'), parse: true
 
       results = population.calculate(testPatients.first())
 

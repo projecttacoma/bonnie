@@ -104,7 +104,7 @@ describe 'Continuous Variable Calculations', ->
 
     @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
     @population = @measure.get('populations').at(0)
-    @patients = new Thorax.Collections.Patients getJSONFixture('records/core_measures/CMS32/patients.json'), parse: true
+    @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32/patients.json'), parse: true
 
   afterEach ->
     bonnie.valueSetsByOid = @universalValueSetsByOid

@@ -45,7 +45,7 @@ describe 'Production_PatientBuilderView', ->
       @cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/special_measures/CMS722/CMS722v0.json'), parse: true
       bonnie.measures = new Thorax.Collections.Measures()
       bonnie.measures.add @cqlMeasure
-      @patients = new Thorax.Collections.Patients getJSONFixture('records/special_measures/CMS722/patients.json'), parse: true
+      @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS722/patients.json'), parse: true
 
       @addCodedValue = (codeListId, submit=true) ->
         @patientBuilder.$('select[name=type]:first').val('CD').change()
@@ -181,7 +181,7 @@ describe 'Production_PatientBuilderView', ->
       jasmine.getJSONFixtures().clearCache()
       bonnie.valueSetsByOid = getJSONFixture('measure_data/special_measures/CMSv54321/value_sets.json')
       @measure = new Thorax.Models.Measure getJSONFixture('measure_data/special_measures/CMSv54321/CMSv54321.json'), parse: true
-      @patients = new Thorax.Collections.Patients getJSONFixture('records/special_measures/CMSv54321/patients.json'), parse: true
+      @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMSv54321/patients.json'), parse: true
       bonnie.measures.add @measure
 
     it 'Assessment Order calculates correctly', ->
