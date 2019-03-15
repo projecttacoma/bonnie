@@ -72,7 +72,7 @@ class Thorax.Models.Measure extends Thorax.Model
 
   isPopulated: -> @has('data_criteria')
 
-  populationCriteria: -> _.intersection(Thorax.Models.Measure.allPopulationCodes, _(@get('population_criteria')).map (p) -> p.type)
+  populationCriteria: -> _.intersection(Thorax.Models.Measure.allPopulationCodes, _(@get('cqmMeasure').population_criteria).map (p) -> p.type)
 
   valueSets: ->
     valSets = []
@@ -163,8 +163,8 @@ class Thorax.Collections.Measures extends Thorax.Collection
   comparator: (m1, m2) ->
     isM1New = m1.get('patients').isEmpty()
     isM2New = m2.get('patients').isEmpty()
-    timeDifference = -1 * (new Date(m1.get('updated_at')) - new Date(m2.get('updated_at')))
-    titleComparison = m1.get('title').localeCompare(m2.get('title'))
+    timeDifference = -1 * (new Date(m1.get('cqmMeasure').updated_at) - new Date(m2.get('cqmMeasure').updated_at))
+    titleComparison = m1.get('cqmMeasure').title.localeCompare(m2.get('cqmMeasure').title)
     if isM1New and isM2New
       if timeDifference is 0
         return titleComparison
@@ -188,7 +188,7 @@ class Thorax.Collections.Measures extends Thorax.Collection
 
   toOids: ->
     measureToOids = {} # measure hqmf_set_id : valueSet oid
-    @each (m) => measureToOids[m.get('hqmf_set_id')] = m.valueSets().pluck('oid')
+    @each (m) => measureToOids[m.get('cqmMeausre').hqmf_set_id] = m.valueSets().pluck('oid')
     measureToOids
     
   deepClone: ->

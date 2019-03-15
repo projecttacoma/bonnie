@@ -47,32 +47,32 @@ class CQLResultsHelpers
   # the relevance of the population defining statement and its dependent statements.
   # @public
   # @param {object} populationRelevance - The `population_relevance` map, used at the starting point.
-  # @param {Measure} measure - The measure.
+  # @param {cqmMeasure} measure - The measure.
   # @param {population} populationSet - The population set being calculated.
   # @returns {object} The `statement_relevance` map that maps each statement to its relevance status for a calculation.
   #   This structure is put in the Result object's attributes.
   ###
-  @buildStatementRelevanceMap: (populationRelevance, measure, populationSet) ->
+  @buildStatementRelevanceMap: (populationRelevance, cqmMeasure, populationSet) ->
     # build map defaulting to not applicable (NA) using cql_statement_dependencies structure
     statementRelevance = {}
-    for library in measure.get('cql_libraries')
+    for library in cqmMeasure.cql_libraries
       statementRelevance[library.library_name] = {}
       for statement in library.statement_dependencies
         statementRelevance[library.library_name][statement.statement_name] = "NA"
 
-    if measure.get('calculate_sdes') && populationSet.get('supplemental_data_elements')
+    if cqmMeasure.calculate_sdes && populationSet.get('supplemental_data_elements')
       for statement in populationSet.get('supplemental_data_elements')
         # Mark all Supplemental Data Elements as relevant
-        @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), statement.statement_name, "TRUE")
+        @_markStatementRelevant(cqmMeasure.cql_libraries, statementRelevance, cqmMeasure.main_cql_library, statement.statement_name, "TRUE")
 
     for population, relevance of populationRelevance
       # If the population is values, that means we need to mark relevance for the OBSERVs
       if (population == 'values')
         for observation in populationSet.get('observations')
-          @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), observation.observation_function.statement_name, relevance)
+          @_markStatementRelevant(cqmMeasure.cql_libraries, statementRelevance, cqmMeasure.main_cql_library, observation.observation_function.statement_name, relevance)
       else
         relevantStatement = populationSet.get('populations')[population].statement_name
-        @_markStatementRelevant(measure.get('cql_libraries'), statementRelevance, measure.get('main_cql_library'), relevantStatement, relevance)
+        @_markStatementRelevant(cqmMeasure.cql_libraries, statementRelevance, cqmMeasure.main_cql_library, relevantStatement, relevance)
     return statementRelevance
 
   ###*

@@ -133,7 +133,7 @@
       # Since the line above is needed to handle the error cleanup we are using Costanza.emit to push this error
       Costanza.emit({
         section: 'cql-measure-calculation',
-        cms_id: result.measure.get('cms_id'),
+        cms_id: result.measure.get('cqmMeasure').cms_id,
         stack: error.stack,
         msg: error.message,
         type: 'javascript'
@@ -155,7 +155,7 @@
     population_results = {}
     episode_results = null
     # patient based measure
-    if !(population.collection.parent.get('calculation_method') == 'EPISODE_OF_CARE')
+    if !(population.collection.parent.get('cqmMeasure').calculation_method == 'EPISODE_OF_CARE')
       population_results = @handlePopulationValues(@createPatientPopulationValues(population, results, patient, observation_defs))
     else # episode of care based measure
       # collect results per episode

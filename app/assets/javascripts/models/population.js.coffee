@@ -6,7 +6,7 @@ class Thorax.Models.PopulationSet extends Thorax.Model
 
   measure: -> @collection.parent
 
-  displayName: -> "#{@measure().get('cms_id')}#{if @measure().get('populations').length > 1 then @get('sub_id') else ''}"
+  displayName: -> "#{@measure().get('cqmMeasure').cms_id}#{if @measure().get('populations').length > 1 then @get('sub_id') else ''}"
 
   populationCriteria: -> (criteria for criteria in Thorax.Models.Measure.allPopulationCodes when @has(criteria))
 

@@ -18,7 +18,7 @@ class Thorax.Views.FinalizeMeasures extends Thorax.Views.BonnieView
     # if we have no measures to finalize than there's nothing to do
     if @measures.length > 0
       _.each(@measures.models, (measure) =>
-        measure.get('source_data_criteria').comparator = (m) -> m.get('description')
+        measure.get('source_data_criteria').comparator = (m) -> m.get('cqmMeasure').description
         measure.get('source_data_criteria').sort()
       )
       @finalizeDialog = @$("#finalizeMeasureDialog")

@@ -265,11 +265,11 @@ class CQLMeasureHelpers
   # This is used by the logic view to determine which statements are unused to bin them properly. This is effectively
   # creating a statement_relevance map that doesn't regard results at all, to be used when you don't have a result.
   # @public
-  # @param {Measure} measure - The measure.
+  # @param {cqmMeasure} measure - The measure.
   # @param {Population} populationSet - The populationSet we wish to get statement relevance for.
   # @return {object} Statement relevance map for the population set.
   ###
-  @getStatementRelevanceForPopulationSet: (measure, populationSet) ->
+  @getStatementRelevanceForPopulationSet: (cqmMeasure, populationSet) ->
     # create a population relevance map where every population is true.
     populationRelevance = {}
     for popCode in Thorax.Models.Measure.allPopulationCodes
@@ -281,7 +281,7 @@ class CQLMeasureHelpers
         populationRelevance[popCode] = true
 
     # builds and returns this statement relevance map.
-    return CQLResultsHelpers.buildStatementRelevanceMap(populationRelevance, measure, populationSet)
+    return CQLResultsHelpers.buildStatementRelevanceMap(populationRelevance, cqmMeasure, populationSet)
 
   ###*
   # Figure out if a statement is a function given the measure, library name and statement name.
