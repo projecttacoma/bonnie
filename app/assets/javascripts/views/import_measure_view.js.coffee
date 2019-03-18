@@ -6,9 +6,6 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
 
   context: ->
     hqmfSetId = @model.get('cqmMeasure').hqmf_set_id if @model?
-    measureTypeLabel = if @model?
-      if @model.get('type') is 'eh' then 'Eligible Hospital (EH)'
-      else if @model.get('type') is 'ep' then 'Eligible Professional (EP)'
     calculationTypeLabel = if @model?
       if (@model.get('cqmMeasure').calculation_method == 'EPISODE_OF_CARE') is false and @model.get('cqmMeasure').measure_scoring is 'PROPORTION' then 'Patient Based'
       else if (@model.get('cqmMeasure').calculation_method == 'EPISODE_OF_CARE') is true then 'Episode of Care'
@@ -22,7 +19,6 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
       dialogTitle: if @model? then @model.get('cqmMeasure').title else "New Measure"
       isUpdate: @model?
       showLoadInformation: !@model? && @firstMeasure
-      measureTypeLabel: measureTypeLabel
       calculationTypeLabel: calculationTypeLabel
       calcSDEs: calcSDEs
       hqmfSetId: hqmfSetId
@@ -31,7 +27,6 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
 
   events:
     rendered: ->
-      @$("option[value=\"#{eoc}\"]").attr('selected','selected') for eoc in @model.get('episode_ids') if @model? && (@model.get('cqmMeasure').calculation_method == 'EPISODE_OF_CARE') && @model.get('episode_ids')?
       @$el.on 'hidden.bs.modal', -> @remove() unless $('#pleaseWaitDialog').is(':visible')
       @$("input[type=radio]:checked").next().css("color","white")
       # start load of profile names
@@ -223,7 +218,6 @@ class Thorax.Views.ImportMeasure extends Thorax.Views.BonnieView
   setup: ->
     @importDialog = @$("#importMeasureDialog")
     @importWait = @$("#pleaseWaitDialog")
-    @finalizeDialog = @$("#finalizeMeasureDialog")
 
   display: ->
     @importDialog.modal(

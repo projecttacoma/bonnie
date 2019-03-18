@@ -61,9 +61,6 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
     else
       @logicView = populationLogicView
 
-   # @complexityView = new Thorax.Views.MeasureComplexity model: @model
-   # @complexityView.listenTo @logicView, 'population:update', (population) -> @updatePopulation(population)
-
     pView = new Thorax.Views.MeasureValueSets model: @model
 
     @populationCalculation = new Thorax.Views.PopulationCalculation(model: @population)
@@ -81,10 +78,6 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
     @logicView.listenTo @populationCalculation, 'rationale:clear', -> @clearRationale()
     @logicView.listenTo @populationCalculation, 'rationale:show', (result) -> @showRationale(result)
     @measures = @model.collection
-
-  episodesOfCare: ->
-    return null unless @model.has('episode_ids')
-    @model.get('source_data_criteria').filter((sdc) => sdc.get('source_data_criteria') in @model.get('episode_ids'))
 
   updateMeasure: (e) ->
     importMeasureView = new Thorax.Views.ImportMeasure(model: @model)
