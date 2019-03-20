@@ -3,8 +3,7 @@ class Thorax.Views.CqlPatientBuilderLogic extends Thorax.Views.BonnieView
   template: JST['logic/cql_patient_builder_logic']
 
   initialize: ->
-    @population_names = Object.keys(@model.get('cqmMeasure').population_criteria)
-    @results = {}
+    @population_names = Object.keys(@model.get("displayedPopulation").get("populations"))    @results = {}
     for pop in @population_names
       @results[pop] = 0
     @cqlLogicView = new Thorax.Views.CqlPopulationLogic(model: @model, highlightPatientDataEnabled: true, population: @population)

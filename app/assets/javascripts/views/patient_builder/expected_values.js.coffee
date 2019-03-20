@@ -60,7 +60,7 @@ class Thorax.Views.ExpectedValueView extends Thorax.Views.BuilderChildView
         # Only parse existing values
         if @isNumbers && attr[pc]
           attr[pc] = parseFloat(attr[pc])
-        else if pc != '_id'
+        else
           attr[pc] = if attr[pc] then 1 else 0 # Convert from check-box true/false to 0/1
       if populationSet.has('observations') && @isMultipleObserv && attr['OBSERV']
         attr['OBSERV'] = [].concat(attr['OBSERV'])

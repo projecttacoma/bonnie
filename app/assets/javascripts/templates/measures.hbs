@@ -49,7 +49,7 @@
         {{#if multiplePopulations}}
           <span class="sr-only">{{cqmMeasure.cms_id}} has </span><span class="patient-listing">{{patients.length}}</span><span class="sr-only"> test patients</span>
         {{else}}
-          {{view "MeasureFractionView" model=differences.summary cms_id=cms_id}}
+          {{view "MeasureFractionView" model=differences.summary cms_id=cqmMeasure.cms_id}}
         {{/if}}
         {{#unless cqmMeasure.composite}}
           <a href="#measures/{{cqmMeasure.hqmf_set_id}}/patients/new" class="btn {{#unless patients.length}}btn-primary{{else}}btn-default{{/unless}}">
@@ -84,22 +84,22 @@
         <div class="component-measure">
           <div class="component-measure-col">
             <div class="component-measure-title">
-              {{#link "measures/{{hqmf_set_id}}" expand-tokens=true}}<span class="sr-only">{{cms_id}}, Measure Title: </span>{{title}}{{/link}}
-              <span class="sr-only">CMS ID: </span><span class="component-cms-id">{{cms_id}}</span>
+              {{#link "measures/{{cqmMeasure.hqmf_set_id}}" expand-tokens=true}}<span class="sr-only">{{cqmMeasure.cms_id}}, Measure Title: </span>{{title}}{{/link}}
+              <span class="sr-only">CMS ID: </span><span class="component-cms-id">{{cqmMeasure.cms_id}}</span>
             </div>
           </div>
           <div class="expected-col">
-            {{view "MeasurePercentageView" model=differences.summary cms_id=cms_id}}
+            {{view "MeasurePercentageView" model=differences.summary cms_id=cqmMeasure.cms_id}}
           </div>
           <div class="status-col">
-            {{view "MeasureStatusView" model=differences.summary cms_id=cms_id}}
+            {{view "MeasureStatusView" model=differences.summary cms_id=cqmMeasure.cms_id}}
           </div>
           <div class="patient-listing-col">
-            {{view "MeasureFractionView" model=differences.summary cms_id=cms_id}}
-            <a href="#measures/{{hqmf_set_id}}/patients/new" class="btn {{#unless patients.length}}btn-primary{{else}}btn-default{{/unless}}">
+            {{view "MeasureFractionView" model=differences.summary cms_id=cqmMeasure.cms_id}}
+            <a href="#measures/{{cqmMeasure.hqmf_set_id}}/patients/new" class="btn {{#unless patients.length}}btn-primary{{else}}btn-default{{/unless}}">
               <i class="fa fa-user" aria-hidden="true"></i>
               <i class="fa fa-plus" aria-hidden="true"></i>
-              <span class="sr-only">{{cms_id}}, add new patient to measure</span>
+              <span class="sr-only">{{cqmMeasure.cms_id}}, add new patient to measure</span>
             </a>
           </div>
         </div>

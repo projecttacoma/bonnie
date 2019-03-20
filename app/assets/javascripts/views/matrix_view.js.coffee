@@ -9,7 +9,7 @@ class Thorax.Views.Matrix extends Thorax.Views.BonnieView
     @patients.sort()
 
   context: ->
-    _(super).extend measures: @collection.populations().map (p) -> name: p.displayName(), hqmf_set_id: p.measure().get('hqmf_set_id')
+    _(super).extend measures: @collection.populations().map (p) -> name: p.displayName(), hqmf_set_id: p.measure().get('cqmMeasure').hqmf_set_id
 
   patientContext: (p) ->
     _(p.toJSON()).extend results: @collection.populations().map (m) -> m.calculate(p)
