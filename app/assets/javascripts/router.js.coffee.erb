@@ -61,7 +61,7 @@
 
   renderPatientBuilder: (measureHqmfSetId, patientId) ->
     measure = @measures.findWhere({hqmf_set_id: measureHqmfSetId}) if measureHqmfSetId
-    patient = if patientId? then @patients.get(patientId) else new Thorax.Models.Patient {measure_ids: [measure?.get('hqmf_set_id')]}, parse: true
+    patient = if patientId? then @patients.get(patientId) else new Thorax.Models.Patient {}, parse: true
     if measure? and patient?
       @navigationSetup "Patient Builder", "patient-builder"
       document.title += " - #{measure.get('cms_id')}" if measure?

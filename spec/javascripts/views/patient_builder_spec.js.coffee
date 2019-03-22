@@ -3,17 +3,25 @@ describe 'PatientBuilderView', ->
   beforeEach ->
     jasmine.getJSONFixtures().clearCache()
     @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS134/CMS134v6.json'), parse: true
-    @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS134/patients.json'), parse: true
-    @patient = @patients.models[1]
+    @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS134v6/patients.json'), parse: true
+    @patient = @patients.models[0]
+    
+    # THIS IS TEMPORARY UNTIL THE MEASURE FIXTURES HAVE SOURCE DATA CRITERIA AS DATA ELEMENTS!!!!!!!!!!
+    @measure.set('source_data_criteria', new Thorax.Collections.PatientDataCriteria mongoose.utils.toObject(this.patient.get("cqmPatient").qdmPatient.dataElements), parent: this)
+    # TEMPOROARY TEMPOROARY TEMPOROARY TEMPOROARY TEMPOROARY TEMPOROARY TEMPOROARY TEMPOROARY
+
+
+
     bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS134/value_sets.json')
     @bonnie_measures_old = bonnie.measures
     bonnie.measures = new Thorax.Collections.Measures()
     bonnie.measures.add @measure
     @patientBuilder = new Thorax.Views.PatientBuilder(model: @patient, measure: @measure, patients: @patients)
     # TODO: don't rely on first() for this. What should the criteria be?
-    @firstCriteria = @patientBuilder.model.get('source_data_criteria').first()
+    #@firstCriteria = @patientBuilder.model.get('source_data_criteria').first()
     # Normally the first criteria can't have a value (wrong type); for testing we allow it
-    @firstCriteria.canHaveResult = -> true
+    @patientDataElement = @patientBuilder.patients.first().get("cqmPatient").qdmPatient.dataElements[0]
+    #@firstCriteria.canHaveResult = -> true
     @patientBuilder.render()
     spyOn(@patientBuilder.model, 'materialize')
     spyOn(@patientBuilder.originalModel, 'save').and.returnValue(true)
@@ -122,12 +130,12 @@ describe 'PatientBuilderView', ->
       expect(@patientBuilder.model.get('source_data_criteria').length).toEqual initialSourceDataCriteriaCount + 2
 
     it "acquires the dates of the drop target when dropping on an existing criteria", ->
-      startDate = @patientBuilder.model.get('source_data_criteria').first().get('start_date')
-      endDate = @patientBuilder.model.get('source_data_criteria').first().get('end_date')
+      startDate = @patientBuilder.model.get('source_data_criteria').first().get('prevalencePeriod').low
+      endDate = @patientBuilder.model.get('source_data_criteria').first().get('prevalencePeriod').high
       # droppable 5 used because droppable 1 didn't have a start and end date
       @addEncounter 5, '.criteria-data.droppable:first'
-      expect(@patientBuilder.model.get('source_data_criteria').last().get('start_date')).toEqual startDate
-      expect(@patientBuilder.model.get('source_data_criteria').last().get('end_date')).toEqual endDate
+      expect(@patientBuilder.model.get('source_data_criteria').last().get('prevalencePeriod').low).toEqual startDate
+      expect(@patientBuilder.model.get('source_data_criteria').last().get('prevalencePeriod').high).toEqual endDate
 
     it "materializes the patient", ->
       expect(@patientBuilder.model.materialize).not.toHaveBeenCalled()
@@ -151,7 +159,7 @@ describe 'PatientBuilderView', ->
       @patientBuilder.$("button[data-call-method=save]").click()
 
     it "serializes the attributes correctly", ->
-      dataCriteria = @patientBuilder.model.get('source_data_criteria').where({definition:'diagnosis', title:'Diabetes'})[0]
+      dataCriteria = this.patient.get('cqmPatient').qdmPatient.conditions()[0]
       expect(dataCriteria.get('start_date')).toEqual moment.utc('01/1/2012 3:33', 'L LT').format('X') * 1000
       expect(dataCriteria.get('end_date')).toBeUndefined()
 
@@ -413,7 +421,7 @@ describe 'PatientBuilderView', ->
     beforeEach ->
       cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
       bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS32/value_sets.json')
-      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32/patients.json'), parse: true
+      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32v7/patients.json'), parse: true
       @patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
       @patientBuilder.appendTo 'body'
       @setPopulationVal = (population, value=0, save=true) ->
@@ -555,7 +563,7 @@ describe 'PatientBuilderView', ->
       cqlMeasure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS160/CMS160v6.json'), parse: true
       bonnie.measures = new Thorax.Collections.Measures()
       bonnie.measures.add(cqlMeasure, { parse: true })
-      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS160/patients.json'), parse: true
+      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS160v6/patients.json'), parse: true
       patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
       assessmentPerformed = patientBuilder.model.get('source_data_criteria').at(2)
       editCriteriaView = new Thorax.Views.EditCriteriaView(model: assessmentPerformed, measure: cqlMeasure)
@@ -585,7 +593,7 @@ describe 'PatientBuilderView', ->
       # If bonnie.measures = new Thorax.Collections.Measures() is called here,
       # no WARNING: missing value set message will be shown
       bonnie.measures.add(cqlMeasure, { parse: true })
-      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS160/patients.json'), parse: true
+      patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS160v6/patients.json'), parse: true
       patientBuilder = new Thorax.Views.PatientBuilder(model: patients.first(), measure: cqlMeasure)
       assessmentPerformed = patientBuilder.model.get('source_data_criteria').at(2)
       spyOn(console, 'log')
@@ -657,7 +665,7 @@ describe 'Direct Reference Code Usage', ->
     bonnie.valueSetsByOid = getJSONFixture('cqm_measure_data/core_measures/CMS32/value_sets.json')
     @measure = new Thorax.Models.Measure getJSONFixture('cqm_measure_data/core_measures/CMS32/CMS32v7.json'), parse: true
     bonnie.measures.add(@measure, { parse: true })
-    @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32/patients.json'), parse: true
+    @patients = new Thorax.Collections.Patients getJSONFixture('cqm_patients/CMS32v7/patients.json'), parse: true
 
   afterEach ->
     bonnie.valueSetsByOid = @oldBonnieValueSetsByOid
