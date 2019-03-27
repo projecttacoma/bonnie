@@ -105,11 +105,9 @@
     }
   ],
   "license": "Apache-2.0",
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "browserify": "^16.2.3",
-    "cqm-execution": "https://github.com/projecttacoma/cqm-execution#master",
-    "cqm-models": "https://github.com/projecttacoma/cqm-models#master"
+    "cqm-execution": "https://github.com/projecttacoma/cqm-execution#master"
   }
 }
