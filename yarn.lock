@@ -333,9 +333,9 @@ core-util-is@~1.0.0:
     moment "^2.20.1"
     ucum "0.0.7"
 
-"cqm-execution@https://github.com/projecttacoma/cqm-execution#master":
+"cqm-execution@https://github.com/projecttacoma/cqm-execution#no-pollute-measure-model-populationsets":
   version "1.0.2"
-  resolved "https://github.com/projecttacoma/cqm-execution#ee3f8ea030c172d92b24c04abab38eb8c6d38cac"
+  resolved "https://github.com/projecttacoma/cqm-execution#4d1eb5a8f03e4004e673a5d191560f24ddb34f79"
   dependencies:
     cqm-models "https://github.com/projecttacoma/cqm-models#master"
     lodash "^4.17.5"
@@ -343,7 +343,7 @@ core-util-is@~1.0.0:
 
 "cqm-models@https://github.com/projecttacoma/cqm-models#master":
   version "1.0.2"
-  resolved "https://github.com/projecttacoma/cqm-models#f73bd0aece7c95e952ea058073b9e3a88a88eeee"
+  resolved "https://github.com/projecttacoma/cqm-models#3403ad821db29cd0c8b46e88be05d795b06ee216"
   dependencies:
     cql-execution "https://github.com/cqframework/cql-execution.git"
     mongoose "^5.4.14"
@@ -1003,9 +1003,9 @@ saslprep@^1.0.0:
     sparse-bitfield "^3.0.3"
 
 semver@^5.1.0:
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
-  integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.0.tgz#790a7cf6fea5459bac96110b29b60412dc8ff96b"
+  integrity sha512-Ya52jSX2u7QKghxeoFGpLwCtGlt7j0oY9DYb5apt9nPlJ42ID+ulTXESnt/qAQcoSERyZ5sl3LDIOw0nAn/5DA==
 
 sha.js@^2.4.0, sha.js@^2.4.8, sha.js@~2.4.4:
   version "2.4.11"
