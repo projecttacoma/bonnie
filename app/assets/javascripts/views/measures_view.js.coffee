@@ -17,6 +17,8 @@ class Thorax.Views.MeasureRowView extends Thorax.Views.BonnieView
     fetch: false
 
   initialize: ->
+    # batch calculate this measure
+    bonnie.calculator_selector.calculateAll @model, @model.get('patients')
     # What we display changes for single vs multiple population measures
     @multiplePopulations = @model.get('populations').length > 1
     unless @multiplePopulations
