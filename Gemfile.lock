@@ -36,7 +36,7 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-converter
-  revision: bc3885c3789bc316428bd47ba2c828c134e166ab
+  revision: 143cc16fadce48166b6bc074bb01b1d4ecf469e9
   branch: master
   specs:
     cqm-converter (1.0.3)
@@ -49,7 +49,7 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-models
-  revision: 3b536e7ce9460400e708bec9879e79254597ba61
+  revision: b2be2d00f83a2d49e2d3332fc6c454d80d41a6eb
   branch: master
   specs:
     cqm-models (1.0.2)
