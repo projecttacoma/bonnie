@@ -16,42 +16,32 @@ include Devise::Test::ControllerHelpers
 
   test "create" do
 
-    assert_equal 0, Record.count
-    @patient = {'first'=> 'Betty',
-     'last'=> 'Boop',
-     'gender'=> 'F',
-     'expired'=> 'true' ,
-     'birthdate'=> "1930-10-17",
-     'ethnicity'=> 'B',
-     'race'=> 'B',
-     'start_date'=>'2012-01-01',
-     'end_date'=>'2012-12-31',
-     'source_data_criteria' => [{"id"=>"EncounterPerformedPsychVisitDiagnosticEvaluation", "status"=>"performed", "definition"=>"encounter", "start_date"=>1333206000000,"end_date"=>1333206000000,"value"=>[],"negation"=>"","negation_code_list_id"=>nil,"field_values"=>{},"code_list_id"=>"2.16.840.1.113883.3.526.3.1492"}],
-     'measure_id' => @measure.hqmf_set_id}
+    assert_equal 0, CQM::Patient.count
+    @patient = {'cqmPatient' => {'givenNames'=> ['Betty'],
+     'familyName'=> 'Boop',
+     'bundleId'=> 'F',
+     'expectedValues' => ['true'],
+     'notes'=> "1930-09-09"}}
 
     post :create, @patient
     assert_response :success
-    assert_equal 1, Record.count
-    r = Record.first
-    assert_equal "Betty", r.first
-    assert_equal "Boop", r.last
-    assert_equal "F", r.gender
-    assert_equal 2, r.source_data_criteria.length
-    assert_equal "EncounterPerformedPsychVisitDiagnosticEvaluation", r.source_data_criteria[0]["id"]
-    assert_equal 1, r.encounters.length
+    assert_equal 1, CQM::Patient.count
+    r = CQM::Patient.first
+    assert_equal "Betty", r.givenNames[0]
+    assert_equal "Boop", r.familyName
+    assert_equal "F", r.bundleId
+    assert_equal 1, r.expectedValues.length
     json = JSON.parse(response.body)
 
-    assert_equal "Betty", json["first"]
-    assert_equal "Boop", json["last"]
-    assert_equal "F", json["gender"]
-    assert_equal 2, json["source_data_criteria"].length
-    assert_equal "EncounterPerformedPsychVisitDiagnosticEvaluation", json["source_data_criteria"][0]["id"]
-    assert_equal 1, json["encounters"].length
+    assert_equal "Betty", json["givenNames"][0]
+    assert_equal "Boop", json["familyName"]
+    assert_equal "F", json["bundleId"]
+    assert_equal 1, json["expectedValues"].length
   end
 
   test "create patient for component measure of composite measure" do
     load_measure_fixtures_from_folder(File.join("measures", "CMS890_v5_6"), @user)
-    assert_equal 0, Record.count
+    assert_equal 0, CQM::Patient.count
     @patient = {'first'=> 'Betty',
      'last'=> 'Boop',
      'gender'=> 'F',
@@ -70,8 +60,8 @@ include Devise::Test::ControllerHelpers
                             "244B4F52-C9CA-45AA-8BDB-2F005DA05BFC"]
     post :create, @patient
     assert_response :success
-    assert_equal 1, Record.count
-    r = Record.first
+    assert_equal 1, CQM::Patient.count
+    r = CQM::Patient.first
     assert_equal "Betty", r.first
     assert_equal "Boop", r.last
     assert_equal expected_measure_ids.sort, r.measure_ids.sort
@@ -79,8 +69,8 @@ include Devise::Test::ControllerHelpers
 
   test "update" do
 
-    assert_equal 0, Record.count
-    patient = Record.new
+    assert_equal 0, CQM::Patient.count
+    patient = CQM::Patient.new
     patient.user = @user
     patient.save!
 
@@ -101,8 +91,8 @@ include Devise::Test::ControllerHelpers
 
     post :update,@patient
     assert_response :success
-    assert_equal 1, Record.count
-    r = Record.first
+    assert_equal 1, CQM::Patient.count
+    r = CQM::Patient.first
     assert_equal "Betty", r.first
     assert_equal "Boop", r.last
     assert_equal "F", r.gender
@@ -121,7 +111,7 @@ include Devise::Test::ControllerHelpers
 
 
   test "materialize" do
-   assert_equal 0, Record.count
+   assert_equal 0, CQM::Patient.count
     @patient = {'first'=> 'Betty',
      'last'=> 'Boop',
      'gender'=> 'F',
@@ -136,7 +126,7 @@ include Devise::Test::ControllerHelpers
 
     post :materialize, @patient
     assert_response :success
-    assert_equal 0, Record.count
+    assert_equal 0, CQM::Patient.count
 
     json = JSON.parse(response.body)
 
@@ -151,13 +141,13 @@ include Devise::Test::ControllerHelpers
   test "destroy" do
     records_set = File.join("records","core_measures", "CMS134v6")
     collection_fixtures(records_set)
-    associate_user_with_patients(@user, Record.all)
-    patient = Record.first
+    associate_user_with_patients(@user, CQM::Patient.all)
+    patient = CQM::Patient.first
     assert_equal 3, @user.records.count
     delete :destroy, {id: patient.id}
     assert_response :success
     assert_equal 2, @user.records.count
-    patient = Record.where({id: patient.id}).first
+    patient = CQM::Patient.where({id: patient.id}).first
     assert_nil patient
   end
 
@@ -165,8 +155,8 @@ include Devise::Test::ControllerHelpers
     skip('Need to bring in new patient model and use cqm-reports')
     records_set = File.join("records", "core_measures", "CMS134v6")
     collection_fixtures(records_set)
-    associate_user_with_patients(@user, Record.all)
-    associate_measure_with_patients(@measure, Record.all)
+    associate_user_with_patients(@user, CQM::Patient.all)
+    associate_measure_with_patients(@measure, CQM::Patient.all)
     get :qrda_export, hqmf_set_id: @measure.hqmf_set_id, isCQL: 'true'
     assert_response :success
     assert_equal 'application/zip', response.header['Content-Type']
@@ -405,5 +395,4 @@ include Devise::Test::ControllerHelpers
     temp.close()
     temp.unlink()
   end
-  
 end

@@ -2,23 +2,25 @@ class PatientsController < ApplicationController
   before_filter :authenticate_user!
 
   def update
-    patient = Record.by_user(current_user).find(params[:id]) # FIXME: will we have an ID attribute on server side?
-    update_patient(patient)
+    patient = CQM::Patient.by_user(current_user).find(params[:id]) # FIXME: will we have an ID attribute on server side?
+    # update_patient(patient)
     patient.save!
     render :json => patient
   end
 
   def create
-    patient = update_patient(Record.new)
-    populate_measure_ids_if_composite_measures(patient)
+    patient = CQM::Patient.new(params["cqmPatient"])
+
+    # patient = update_patient(CQM::Patient.new)
+    # populate_measure_ids_if_composite_measures(patient)
     patient.save!
     render :json => patient
   end
 
-  def materialize
-    patient = update_patient(Record.new) # Always materialize a patient from scratch
-    render :json => patient
-  end
+  # def materialize
+  #   patient = update_patient(CQM::Patient.new) # Always materialize a patient from scratch
+  #   render :json => patient
+  # end
 
   def destroy
     patient = Record.by_user(current_user).find(params[:id]) # FIXME: will we have an ID attribute on server side?
