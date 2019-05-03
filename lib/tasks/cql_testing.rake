@@ -19,7 +19,7 @@ namespace :bonnie do
     task :generate_frontend_cql_fixtures, [:cms_hqmf, :path, :user_email, :measure_id, :patient_first_name, :patient_last_name] => [:environment] do |t, args|
       fixtures_path = File.join('spec', 'javascripts', 'fixtures', 'json')
       measure_file_path = File.join(fixtures_path, 'cqm_measure_data', args[:path])
-      record_file_path = File.join(fixtures_path, 'patients', args[:path])
+      record_file_path = File.join(fixtures_path, 'cqm_patients', args[:path])
 
       user = User.find_by email: args[:user_email]
       cqm_measure = get_cqm_measure(user, args[:cms_hqmf], args[:measure_id])
@@ -126,7 +126,7 @@ namespace :bonnie do
     end
 
     desc %{Export patient fixtures for a given account. Uses vsac credentials from environmental vars.
-      Exports into test/fixtures/patients/<CMS_ID> and spec/javascripts/fixtures/json/patients/<CMS_ID>
+      Exports into test/fixtures/cqm_patients/<CMS_ID> and spec/javascripts/fixtures/json/cqm_patients/<CMS_ID>
       example: bundle exec rake bonnie:fixtures:generate_cqm_patient_fixtures_from_cql_patients[bonnie-fixtures@mitre.org]}
     task :generate_cqm_patient_fixtures_from_cql_patients, [:email] => [:environment] do |task, args|
       email = args[:email]
