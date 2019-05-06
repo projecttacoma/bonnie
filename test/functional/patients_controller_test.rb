@@ -17,11 +17,34 @@ include Devise::Test::ControllerHelpers
   test "create" do
 
     assert_equal 0, CQM::Patient.count
-    @patient = {'cqmPatient' => {'givenNames'=> ['Betty'],
-     'familyName'=> 'Boop',
-     'bundleId'=> 'F',
-     'expectedValues' => ['true'],
-     'notes'=> "1930-09-09"}}
+
+    @qdm_data_element = {
+      "dataElementCodes"=>[{"code"=>"M", "system"=>"2.16.840.1.113883.5.1", "display"=>"Male"}],
+      "_id"=>"5ccb0c8857a11ed7a196dc9e",
+      "qdmTitle"=>"Patient Characteristic Sex",
+      "hqmfOid"=>"2.16.840.1.113883.10.20.28.4.55",
+      "qdmCategory"=>"patient_characteristic",
+      "qdmStatus"=>"gender",
+      "qdmVersion"=>"5.4",
+      "_type"=>"QDM::PatientCharacteristicSex",
+      "codeListId"=>"2.16.840.1.113762.1.4.1",
+      "description"=>"Patient Characteristic Sex: ONCAdministrativeSex",
+      "id"=>{"qdmVersion"=>"5.4", "namingSystem"=>nil, "value"=>"5ccb0c8857a11ed7a196dc9e"}
+    }
+    @qdm_patient = {
+      'birthDatetime' => '1930-09-09',
+      'qdmVersion' => '-1.3',
+      'dataElements' => [@qdm_data_element],
+      'extendedData' => {'adverse_event' => 'ADVERSE EVENT', 'encounter' => 'ENCOUNTER', 'family_history' => 'MYSTERIOUS'}
+    }
+    @patient = { 'cqmPatient' => {
+      'givenNames'=> ['Betty'],
+      'familyName'=> 'Boop',
+      'bundleId'=> 'F',
+      'expectedValues' => ['true'],
+      'notes'=> 'Boop-Oop-a-Doop',
+      'qdmPatient' => @qdm_patient
+      }}
 
     post :create, @patient
     assert_response :success
@@ -31,6 +54,7 @@ include Devise::Test::ControllerHelpers
     assert_equal "Boop", r.familyName
     assert_equal "F", r.bundleId
     assert_equal 1, r.expectedValues.length
+    assert_equal 1, r.qdmPatient.dataElements.length
     json = JSON.parse(response.body)
 
     assert_equal "Betty", json["givenNames"][0]
@@ -42,13 +66,19 @@ include Devise::Test::ControllerHelpers
   test "create patient for component measure of composite measure" do
     load_measure_fixtures_from_folder(File.join("measures", "CMS890_v5_6"), @user)
     assert_equal 0, CQM::Patient.count
-    @patient = {'first'=> 'Betty',
-     'last'=> 'Boop',
-     'gender'=> 'F',
-     'birthdate'=> "1930-10-17",
-     'start_date'=>'2012-01-01',
-     'end_date'=>'2012-12-31',
-     'measure_id' => "244B4F52-C9CA-45AA-8BDB-2F005DA05BFC&3000797E-11B1-4F62-A078-341A4002A11C"}
+    @qdm_patient = {
+      'birthDatetime' => '1930-09-09',
+      'qdmVersion' => '-1.3',
+      'extendedData' => {'adverse_event' => 'ADVERSE EVENT', 'encounter' => 'ENCOUNTER', 'family_history' => 'MYSTERIOUS'}
+    }
+    @patient = {'givenNames'=> ['Betty'],
+      'familyName'=> 'Boop',
+      'gender'=> 'F',
+      'birthdate'=> "1930-10-17",
+      'qdmPatient' => @qdm_patient,
+      #'start_date'=>'2012-01-01',
+      #'end_date'=>'2012-12-31',
+      'measure_ids' => ["244B4F52-C9CA-45AA-8BDB-2F005DA05BFC&3000797E-11B1-4F62-A078-341A4002A11C"]}
 
     expected_measure_ids = ["244B4F52-C9CA-45AA-8BDB-2F005DA05BFC&3000797E-11B1-4F62-A078-341A4002A11C",
                             "244B4F52-C9CA-45AA-8BDB-2F005DA05BFC&920D5B27-DF5A-4770-BD60-FC4EE251C4D2",
