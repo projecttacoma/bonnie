@@ -124,45 +124,15 @@ include Devise::Test::ControllerHelpers
     #assert_equal 1, json["encounters"].length
   end
 
-
-  test "materialize" do
-   assert_equal 0, CQM::Patient.count
-    @patient = {'first'=> 'Betty',
-     'last'=> 'Boop',
-     'gender'=> 'F',
-     'expired'=> 'true' ,
-     'birthdate'=> "1930-10-17",
-     'ethnicity'=> 'B',
-     'race'=> 'B',
-     'start_date'=>'2012-01-01',
-     'end_date'=>'2012-12-31',
-     'source_data_criteria' => [{"id"=>"EncounterPerformedPsychVisitDiagnosticEvaluation","status"=>"performed", "definition"=>"encounter", "start_date"=>1333206000000,"end_date"=>1333206000000,"value"=>[],"negation"=>"","negation_code_list_id"=>nil,"field_values"=>{},"code_list_id"=>"2.16.840.1.113883.3.526.3.1492"}],
-     'measure_id' => @measure.hqmf_set_id}
-
-    post :materialize, @patient
-    assert_response :success
-    assert_equal 0, CQM::Patient.count
-
-    json = JSON.parse(response.body)
-
-    assert_equal "Betty", json["first"]
-    assert_equal "Boop", json["last"]
-    assert_equal "F", json["gender"]
-    assert_equal 2, json["source_data_criteria"].length
-    assert_equal "EncounterPerformedPsychVisitDiagnosticEvaluation", json["source_data_criteria"][0]["id"]
-    assert_equal 1, json["encounters"].length
-  end
-
   test "destroy" do
-    records_set = File.join("records","core_measures", "CMS134v6")
+    records_set = File.join("cqm_patients", "CMS134v6")
     collection_fixtures(records_set)
     associate_user_with_patients(@user, CQM::Patient.all)
     patient = CQM::Patient.first
-    assert_equal 3, @user.records.count
-    binding.pry
+    assert_equal 2, @user.patients.count
     delete :destroy, {id: patient.id}
     assert_response :success
-    assert_equal 2, @user.records.count
+    assert_equal 1, @user.patients.count
     patient = CQM::Patient.where({id: patient.id}).first
     assert_nil patient
   end
