@@ -41,7 +41,7 @@ include Devise::Test::ControllerHelpers
       'notes'=> 'Boop-Oop-a-Doop',
       'qdmPatient' => qdm_patient,
       'measure_ids' => ["244B4F52-C9CA-45AA-8BDB-2F005DA05BFC"]
-      }}
+    }}
   end
 
   test "create" do
@@ -54,6 +54,8 @@ include Devise::Test::ControllerHelpers
     assert_equal "Betty", r.givenNames[0]
     assert_equal "Boop", r.familyName
     assert_equal "F", r.bundleId
+    assert_equal '-1.3', r.qdmPatient.qdmVersion
+    assert_equal '2.16.840.1.113883.10.20.28.4.55', r.qdmPatient.dataElements.first.hqmfOid
     assert_equal 1, r.expectedValues.length
     assert_equal 1, r.qdmPatient.dataElements.length
     json = JSON.parse(response.body)
@@ -61,6 +63,8 @@ include Devise::Test::ControllerHelpers
     assert_equal "Betty", json["givenNames"][0]
     assert_equal "Boop", json["familyName"]
     assert_equal "F", json["bundleId"]
+    assert_equal '-1.3', json["qdmPatient"]["qdmVersion"]
+    assert_equal '2.16.840.1.113883.10.20.28.4.55', json["qdmPatient"]['dataElements'][0]['hqmfOid']
     assert_equal 1, json["expectedValues"].length
   end
 
@@ -92,6 +96,7 @@ include Devise::Test::ControllerHelpers
     r = CQM::Patient.first
     assert_equal "Betty", r.givenNames[0]
     assert_equal "Boop", r.familyName
+    assert_equal '-1.3', r.qdmPatient.qdmVersion
     assert_equal expected_measure_ids.sort, r.measure_ids.sort
   end
 
@@ -111,17 +116,14 @@ include Devise::Test::ControllerHelpers
     r = CQM::Patient.first
     assert_equal "Betty", r.givenNames[0]
     assert_equal "Boop", r.familyName
-    #assert_equal 2, r.source_data_criteria.length
-    #assert_equal "EncounterPerformedPsychVisitDiagnosticEvaluation", r.source_data_criteria[0]["id"]
-    #assert_equal 1, r.encounters.length
+    assert_equal '-1.3', r.qdmPatient.qdmVersion
+    assert_equal '2.16.840.1.113883.10.20.28.4.55', r.qdmPatient.dataElements.first.hqmfOid
     json = JSON.parse(response.body)
 
     assert_equal "Betty", json["givenNames"][0]
     assert_equal "Boop", json["familyName"]
-    #assert_equal "F", json["gender"]
-    #assert_equal 2, json["source_data_criteria"].length
-    #assert_equal "EncounterPerformedPsychVisitDiagnosticEvaluation", json["source_data_criteria"][0]["id"]
-    #assert_equal 1, json["encounters"].length
+    assert_equal '-1.3', json["qdmPatient"]["qdmVersion"]
+    assert_equal '2.16.840.1.113883.10.20.28.4.55', json["qdmPatient"]['dataElements'][0]['hqmfOid']
   end
 
   test "destroy" do
@@ -135,6 +137,29 @@ include Devise::Test::ControllerHelpers
     assert_equal 1, @user.patients.count
     patient = CQM::Patient.where({id: patient.id}).first
     assert_nil patient
+  end
+
+  test "invalid patients" do
+    assert_equal 0, CQM::Patient.count
+    @patient['cqmPatient']['qdmPatient']['_type'] = 'QDMPatient'
+    post :create, @patient
+    assert_response :internal_server_error
+    assert_equal 0, CQM::Patient.count
+
+    @patient['cqmPatient']['qdmPatient'].delete('_type')
+    post :create, @patient
+    assert_response :success
+    assert_equal 1, CQM::Patient.count
+
+    updated_patient = @patient
+    updated_patient['cqmPatient']['qdmPatient']['_type'] = 'QDMPatient'
+    updated_patient['cqmPatient']['givenNames'] = ['These', 'are', 'not', 'real', 'names']
+    updated_patient['_id'] = CQM::Patient.first._id.to_s
+    updated_patient['id'] = CQM::Patient.first.id.to_s
+    post :update, updated_patient
+    assert_response :internal_server_error
+    assert_equal 1, CQM::Patient.count
+    assert_equal 1, CQM::Patient.first.givenNames.length
   end
 
   test "export patients" do

@@ -3,7 +3,12 @@ class PatientsController < ApplicationController
 
   def update
     old_patient = CQM::Patient.by_user(current_user).find(params[:_id])
-    updated_patient = CQM::Patient.new(params["cqmPatient"])
+    begin
+      updated_patient = CQM::Patient.new(params["cqmPatient"])
+    rescue Mongoid::Errors::UnknownAttribute
+      render json: {status: "error", messages: "Patient not properly structured for creation."}, status: :internal_server_error
+      return
+    end
     updated_patient._id = old_patient._id
     updated_patient.user_id = old_patient.user_id
     updated_patient.upsert
@@ -11,7 +16,12 @@ class PatientsController < ApplicationController
   end
 
   def create
-    patient = CQM::Patient.new(params["cqmPatient"])
+    begin
+      patient = CQM::Patient.new(params["cqmPatient"])
+    rescue Mongoid::Errors::UnknownAttribute
+      render json: {status: "error", messages: "Patient not properly structured for creation."}, status: :internal_server_error
+      return
+    end
     populate_measure_ids_if_composite_measures(patient)
     patient.save!
     render :json => patient
@@ -83,6 +93,7 @@ class PatientsController < ApplicationController
   end
 
 private
+
   # if the patient has any existing measure ids that correspond to component measures, all 'sibling' measure ids will be added
   def populate_measure_ids_if_composite_measures(patient)
     # create array of unique parent composite measure ids

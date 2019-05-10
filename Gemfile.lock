@@ -36,7 +36,7 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-converter
-  revision: bc3885c3789bc316428bd47ba2c828c134e166ab
+  revision: c1ac4080fe027335ef0ae82a5f8749cadb8b0ef8
   branch: master
   specs:
     cqm-converter (1.0.3)
@@ -49,8 +49,8 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-models
-  revision: d1ccbea6451f02fed3c5ef4e443a53bc6f29b000
-  branch: master
+  revision: 6871f80f568b54ab28599dc153c202cb1ab497d2
+  branch: saving_patients
   specs:
     cqm-models (1.0.2)
 
