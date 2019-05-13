@@ -55,7 +55,7 @@ namespace :bonnie do
 
       user = User.find_by email: args[:user_email]
       measure = get_cqm_measure(user, args[:cms_hqmf], args[:measure_id])
-      records = Record.by_user_and_hqmf_set_id(user, measure.hqmf_set_id)
+      records = CQM::Patient.by_user_and_hqmf_set_id(user, measure.hqmf_set_id)
 
       fixture_exporter = BackendFixtureExporter.new(user, measure: measure, records: records)
       fixture_exporter.export_measure_and_any_components(measure_file_path)
