@@ -40,6 +40,10 @@ gem 'cqm-converter', :git => 'https://github.com/projecttacoma/cqm-converter', :
 # gem 'hquery-patient-api', :path => '../patientapi'
 # gem 'cqm-converter', :path => '../cqm-converter'
 
+gem 'cqm-models', '1.0.2'
+gem 'mustache'
+gem 'cqm-reports', :git => 'https://github.com/projecttacoma/cqm-reports', :branch => 'bonnie_export'
+
 # needed for HDS
 gem 'rubyzip', '>= 1.2.1'
 gem 'zip-zip'
