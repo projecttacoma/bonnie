@@ -496,6 +496,26 @@ namespace :bonnie do
         puts "-- #{key}: #{value} --"
       end
     end
+
+    desc "Copy start_time to authorDatetime for patients"
+    task :copy_author_datetime => :environment do
+      user = User.find_by email: ENV["EMAIL"] if ENV["EMAIL"]
+      raise StandardError.new("EMAIL of user not provided.") if user.nil?
+      records = user.records
+      count = 0
+      records.each do |r|
+        binding.pry
+
+        puts "Materializing #{r.last} #{r.first}"
+        begin
+          r.rebuild!
+          count += 1
+        rescue => e
+          puts "Error materializing #{r.first} #{r.last}: #{e.message}"
+        end
+      end
+      puts "Materialized #{count} of #{records.count} patients"
+    end
     
     def self.set_data_criteria_code_list_ids(json, cql_artifacts)
       # Loop over data criteria to search for data criteria that is using a single reference code.
