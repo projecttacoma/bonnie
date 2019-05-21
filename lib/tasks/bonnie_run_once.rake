@@ -508,6 +508,20 @@ namespace :bonnie do
 
         puts "Materializing #{r.last} #{r.first}"
         begin
+          r.source_data_criteria.each do |sdc|
+            # if SDC doesnt have AUTHOR_DATETIME copy it from start_time
+            unless sdc["field_values"].has_key?("AUTHOR_DATETIME")
+              sdc.
+              {
+              "type": "TS",
+              "code_list_id": "",
+              "field_title": "Author Date/Time",
+              "start_date": "02/09/2012",
+              "start_time": "8:00 AM",
+              "value": 1328774400000
+              }
+            end
+          end
           r.rebuild!
           count += 1
         rescue => e
