@@ -7,57 +7,9 @@ GIT
       json
 
 GIT
-  remote: https://github.com/projecttacoma/bonnie_bundler.git
-  revision: 661ea30f582afe4dfc03e52bd233b0c2098bac22
-  branch: master
-  specs:
-    bonnie_bundler (2.2.4)
-      diffy (~> 3.0.0)
-      health-data-standards (~> 4.3.2)
-      hqmf2js (~> 1.4)
-      hquery-patient-api (~> 1.1)
-      mongoid (~> 5.0)
-      quality-measure-engine (~> 3.2)
-      rails (>= 4.2, < 6.0)
-      roo (~> 2.7)
-      rubyzip (~> 1.2, >= 1.2.1)
-      simplexml_parser (~> 1.0)
-      zip-zip (~> 0.3)
-
-GIT
-  remote: https://github.com/projecttacoma/cql_qdm_patientapi.git
-  revision: 4318dc163f805cca1590640bf1a4b508699e679c
-  branch: master
-  specs:
-    cql_qdm_patientapi (1.3.1)
-      coffee-rails (~> 4.1)
-      rails (>= 4.2, < 6.0)
-      sprockets-rails (~> 2.3)
-
-GIT
-  remote: https://github.com/projecttacoma/cqm-converter
-  revision: bc3885c3789bc316428bd47ba2c828c134e166ab
-  branch: master
-  specs:
-    cqm-converter (1.0.3)
-      activesupport
-      coffee-script
-      execjs
-      health-data-standards (>= 4.3.2)
-      momentjs-rails
-      sprockets
-
-GIT
-  remote: https://github.com/projecttacoma/cqm-models
-  revision: 56d8862c3529bbcba8771640d8364464b7fdbe45
-  branch: master
-  specs:
-    cqm-models (1.0.2)
-
-GIT
   remote: https://github.com/projecttacoma/cqm-parsers
-  revision: 0adaa71c24f288fa11f99715cb2d42afbcb2f2ac
-  branch: master
+  revision: 0049a1fbc3c08bb01bce5637608bc7ecab466333
+  branch: bonnie_version
   specs:
     cqm-parsers (0.2.1)
       activesupport (~> 4.2.0)
@@ -69,7 +21,7 @@ GIT
       mongoid (~> 5.0.0)
       mongoid-tree (~> 2.0.0)
       mustache
-      nokogiri (~> 1.8.5)
+      nokogiri (>= 1.8.5, < 1.11.0)
       protected_attributes (~> 1.0.5)
       rubyzip (~> 1.2.2)
       typhoeus
@@ -144,6 +96,18 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     bcrypt (3.1.12)
+    bonnie_bundler (2.2.5)
+      diffy (~> 3.0.0)
+      health-data-standards (~> 4.3.2)
+      hqmf2js (~> 1.4)
+      hquery-patient-api (~> 1.1)
+      mongoid (~> 5.0)
+      quality-measure-engine (~> 3.2)
+      rails (>= 4.2, < 6.0)
+      roo (~> 1.13)
+      rubyzip (~> 1.2, >= 1.2.1)
+      simplexml_parser (~> 1.0)
+      zip-zip (~> 0.3)
     brakeman (4.4.0)
     browser (2.5.3)
     bson (4.4.2)
@@ -185,6 +149,19 @@ GEM
     colorize (0.8.1)
     commonjs (0.2.7)
     concurrent-ruby (1.1.5)
+    cql_qdm_patientapi (1.3.2)
+      coffee-rails (~> 4.1)
+      rails (>= 4.2, < 6.0)
+      sprockets-rails (~> 2.3)
+    cqm-converter (1.0.4)
+      activesupport
+      coffee-script
+      cqm-models (>= 1.0.3)
+      execjs
+      health-data-standards (>= 4.3.5)
+      momentjs-rails
+      sprockets
+    cqm-models (1.1.1.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
@@ -228,8 +205,8 @@ GEM
       sprockets (>= 2.0.3)
       tilt
     hashdiff (0.3.8)
-    health-data-standards (4.3.3)
-      activesupport (~> 4.2.0)
+    health-data-standards (4.3.5)
+      activesupport (~> 4.2.11)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       highline (~> 1.7.0)
@@ -238,7 +215,7 @@ GEM
       mongo (~> 2.4.3)
       mongoid (~> 5.0.0)
       mongoid-tree (~> 2.0.0)
-      nokogiri (~> 1.8.3)
+      nokogiri (~> 1.10.3)
       protected_attributes (~> 1.0.5)
       rest-client (~> 2.0.1)
       rubyzip (~> 1.2.1)
@@ -291,10 +268,10 @@ GEM
     method_source (0.9.2)
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2018.0812)
+    mime-types-data (3.2019.0331)
     mimemagic (0.3.3)
     mini_mime (1.0.1)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.4.0)
     minitest (5.11.3)
     momentjs-rails (2.20.1)
       railties (>= 3.1)
@@ -317,8 +294,8 @@ GEM
     net-ssh (5.1.0)
     netrc (0.11.0)
     newrelic_rpm (6.0.0.351)
-    nokogiri (1.8.5)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.10.3)
+      mini_portile2 (~> 2.4.0)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
     oj (3.7.8)
@@ -328,7 +305,7 @@ GEM
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
     parallel (1.13.0)
-    parser (2.6.0.0)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
     powerpack (0.1.2)
     protected_attributes (1.0.9)
@@ -398,9 +375,10 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    roo (2.8.2)
-      nokogiri (~> 1)
-      rubyzip (>= 1.2.1, < 2.0.0)
+    roo (1.13.2)
+      nokogiri
+      rubyzip
+      spreadsheet (> 0.6.4)
     rubocop (0.64.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -409,6 +387,7 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.4.0)
+    ruby-ole (1.2.12.2)
     ruby-progressbar (1.10.0)
     rubyzip (1.2.2)
     rvm1-capistrano3 (1.4.0)
@@ -427,6 +406,8 @@ GEM
     simplexml_parser (1.0.1)
       health-data-standards (~> 4.0)
       tilt (~> 1.4)
+    spreadsheet (1.2.3)
+      ruby-ole (>= 1.0)
     sprockets (2.12.5)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -463,7 +444,7 @@ GEM
       json (>= 1.8.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.5)
+    unf_ext (0.0.7.6)
     unicode-display_width (1.4.1)
     url (0.3.2)
     uuid (2.3.9)
@@ -489,7 +470,7 @@ PLATFORMS
 DEPENDENCIES
   apipie-rails!
   axlsx!
-  bonnie_bundler!
+  bonnie_bundler (~> 2.2.5)
   brakeman
   browser
   bundler-audit
@@ -497,9 +478,9 @@ DEPENDENCIES
   codecov
   coffee-rails
   colorize
-  cql_qdm_patientapi!
-  cqm-converter!
-  cqm-models!
+  cql_qdm_patientapi (~> 1.3.2)
+  cqm-converter (~> 1.0.4)
+  cqm-models (~> 1.1.1.0)
   cqm-parsers!
   devise
   doorkeeper (~> 4.4.0)
@@ -507,7 +488,7 @@ DEPENDENCIES
   exception_notification!
   foreman
   handlebars_assets (= 0.16)
-  health-data-standards (~> 4.3.3)
+  health-data-standards (~> 4.3.5)
   hqmf2js (~> 1.4)
   hquery-patient-api (~> 1.1)
   jquery-rails
@@ -527,7 +508,7 @@ DEPENDENCIES
   rails (~> 4.2.11)
   rails_best_practices
   reek
-  roo (~> 2.7)
+  roo
   rubocop
   rubyzip (>= 1.2.1)
   rvm1-capistrano3

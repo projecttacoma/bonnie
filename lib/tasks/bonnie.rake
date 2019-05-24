@@ -295,14 +295,6 @@ namespace :bonnie do
 
       # Import patient objects from JSON file and save
       puts "Importing patients..."
-      raise "FILENAME not specified" unless input_file = ENV['FILENAME']
-      File.foreach(File.join(Rails.root, input_file)) do |p|
-        next if p.blank?
-        patient = Record.new.from_json p.strip
-
-        patient['user_id'] = user._id
-
-        patient['measure_ids'] = []
         patient['measure_ids'] << measure.hqmf_set_id
         patient['measure_ids'] << nil # Need to add a null value at the end of the array.
 
