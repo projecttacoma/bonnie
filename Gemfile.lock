@@ -1,76 +1,27 @@
 GIT
-  remote: https://github.com/hossenlopp/apipie-rails
-  revision: a3e9f3eb092dafc551d3563ccf516cf31b2037d4
-  branch: master
-  specs:
-    apipie-rails (0.3.6)
-      json
-
-GIT
-  remote: https://github.com/projecttacoma/bonnie_bundler.git
-  revision: 612214075ef0a486e4cebdc560365549b056a4f3
-  branch: cqm-integration
-  specs:
-    bonnie_bundler (2.2.4)
-      diffy (~> 3.0.0)
-      health-data-standards (~> 4.3.2)
-      hqmf2js (~> 1.4)
-      hquery-patient-api (~> 1.1)
-      mongoid (~> 5.0)
-      quality-measure-engine (~> 3.2)
-      rails (>= 4.2, < 6.0)
-      roo (~> 2.7)
-      rubyzip (~> 1.2, >= 1.2.1)
-      simplexml_parser (~> 1.0)
-      zip-zip (~> 0.3)
-
-GIT
-  remote: https://github.com/projecttacoma/cql_qdm_patientapi.git
-  revision: 4318dc163f805cca1590640bf1a4b508699e679c
-  branch: master
-  specs:
-    cql_qdm_patientapi (1.3.1)
-      coffee-rails (~> 4.1)
-      rails (>= 4.2, < 6.0)
-      sprockets-rails (~> 2.3)
-
-GIT
-  remote: https://github.com/projecttacoma/cqm-converter
-  revision: c1ac4080fe027335ef0ae82a5f8749cadb8b0ef8
-  branch: master
-  specs:
-    cqm-converter (1.0.3)
-      activesupport
-      coffee-script
-      execjs
-      health-data-standards (>= 4.3.2)
-      momentjs-rails
-      sprockets
-
-GIT
   remote: https://github.com/projecttacoma/cqm-models
-  revision: 5270a0180143558674341d7bc8117edefa8b0c4a
+  revision: 2688b71f537e97d4b9b126f453816b0c7fffda60
   branch: master
   specs:
     cqm-models (1.1.1.0)
 
 GIT
   remote: https://github.com/projecttacoma/cqm-parsers
-  revision: 0049a1fbc3c08bb01bce5637608bc7ecab466333
-  branch: bonnie_version
+  revision: 0bf7ccb81829e6bc0606baf18c9ba878f1c58429
+  branch: master
   specs:
-    cqm-parsers (0.2.1)
-      activesupport (~> 4.2.0)
+    cqm-parsers (1.0.0)
+      activesupport (~> 5.0)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       highline (~> 1.7.0)
       log4r (~> 1.1.10)
       memoist (~> 0.9.1)
-      mongoid (~> 5.0.0)
-      mongoid-tree (~> 2.0.0)
+      mongoid (~> 6.4.2)
+      mongoid-tree (~> 2.1.1)
       mustache
       nokogiri (>= 1.8.5, < 1.11.0)
-      protected_attributes (~> 1.0.5)
+      protected_attributes_continued (~> 1.4.0)
       rubyzip (~> 1.2.2)
       typhoeus
       uuid (~> 2.3.7)
@@ -89,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/smartinez87/exception_notification.git
-  revision: b04948d40e58a268a3cf9324f6cd33ceb207c53f
+  revision: 6a89f3b3b1623fa24d4f7b55a662c3bf2ab6b00b
   branch: master
   specs:
     exception_notification (4.3.0)
@@ -99,59 +50,68 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionmailer (4.2.11.1)
-      actionpack (= 4.2.11.1)
-      actionview (= 4.2.11.1)
-      activejob (= 4.2.11.1)
+    actioncable (5.2.3)
+      actionpack (= 5.2.3)
+      nio4r (~> 2.0)
+      websocket-driver (>= 0.6.1)
+    actionmailer (5.2.3)
+      actionpack (= 5.2.3)
+      actionview (= 5.2.3)
+      activejob (= 5.2.3)
       mail (~> 2.5, >= 2.5.4)
-      rails-dom-testing (~> 1.0, >= 1.0.5)
-    actionpack (4.2.11.1)
-      actionview (= 4.2.11.1)
-      activesupport (= 4.2.11.1)
-      rack (~> 1.6)
-      rack-test (~> 0.6.2)
-      rails-dom-testing (~> 1.0, >= 1.0.5)
+      rails-dom-testing (~> 2.0)
+    actionpack (5.2.3)
+      actionview (= 5.2.3)
+      activesupport (= 5.2.3)
+      rack (~> 2.0)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (4.2.11.1)
-      activesupport (= 4.2.11.1)
+    actionview (5.2.3)
+      activesupport (= 5.2.3)
       builder (~> 3.1)
-      erubis (~> 2.7.0)
-      rails-dom-testing (~> 1.0, >= 1.0.5)
+      erubi (~> 1.4)
+      rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    activejob (4.2.11.1)
-      activesupport (= 4.2.11.1)
-      globalid (>= 0.3.0)
-    activemodel (4.2.11.1)
-      activesupport (= 4.2.11.1)
-      builder (~> 3.1)
-    activerecord (4.2.11.1)
-      activemodel (= 4.2.11.1)
-      activesupport (= 4.2.11.1)
-      arel (~> 6.0)
-    activesupport (4.2.11.1)
-      i18n (~> 0.7)
+    activejob (5.2.3)
+      activesupport (= 5.2.3)
+      globalid (>= 0.3.6)
+    activemodel (5.2.3)
+      activesupport (= 5.2.3)
+    activerecord (5.2.3)
+      activemodel (= 5.2.3)
+      activesupport (= 5.2.3)
+      arel (>= 9.0)
+    activestorage (5.2.3)
+      actionpack (= 5.2.3)
+      activerecord (= 5.2.3)
+      marcel (~> 0.3.1)
+    activesupport (5.2.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
       minitest (~> 5.1)
-      thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
-    airbrussh (1.3.1)
+    airbrussh (1.3.2)
       sshkit (>= 1.6.1, != 1.7.0)
-    arel (6.0.4)
+    apipie-rails (0.5.16)
+      rails (>= 4.1)
+    arel (9.0.0)
     ast (2.4.0)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.12)
-    brakeman (4.4.0)
+    bcrypt (3.1.13)
+    brakeman (4.5.1)
     browser (2.5.3)
-    bson (4.4.2)
+    bson (4.5.0)
     builder (3.2.3)
     bundler-audit (0.6.1)
       bundler (>= 1.2.0, < 3)
       thor (~> 0.18)
-    byebug (10.0.2)
+    byebug (11.0.1)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -175,9 +135,9 @@ GEM
     coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    coffee-rails (4.2.2)
+    coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
-      railties (>= 4.0.0)
+      railties (>= 5.2.0)
     coffee-script (2.4.1)
       coffee-script-source
       execjs
@@ -189,35 +149,27 @@ GEM
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
     daemons (1.3.1)
-    delayed_job (4.1.5)
-      activesupport (>= 3.0, < 5.3)
-    delayed_job_mongoid (2.3.0)
-      delayed_job (>= 3.0, < 5)
-      mongoid (>= 3.0, < 7)
-      mongoid-compatibility (>= 0.4.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (4.6.1)
+    devise (4.6.2)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 4.1.0, < 6.0)
       responders
       warden (~> 1.2.3)
-    diffy (3.0.7)
-    docile (1.3.1)
-    domain_name (0.5.20180417)
-      unf (>= 0.0.5, < 1.0.0)
+    docile (1.3.2)
     doorkeeper (4.4.3)
       railties (>= 4.2)
     doorkeeper-mongodb (4.1.0)
       doorkeeper (>= 4.0.0, < 5.0)
     equalizer (0.0.11)
+    erubi (1.8.0)
     erubis (2.7.0)
     ethon (0.12.0)
       ffi (>= 1.3.0)
     eventmachine (1.2.7)
     execjs (2.7.0)
-    ffi (1.10.0)
+    ffi (1.11.1)
     foreman (0.85.0)
       thor (~> 0.19.1)
     globalid (0.4.2)
@@ -227,49 +179,19 @@ GEM
       multi_json
       sprockets (>= 2.0.3)
       tilt
-    hashdiff (0.3.8)
-    health-data-standards (4.3.5)
-      activesupport (~> 4.2.11)
-      builder (~> 3.1)
-      erubis (~> 2.7.0)
-      highline (~> 1.7.0)
-      log4r (~> 1.1.10)
-      memoist (~> 0.9.1)
-      mongo (~> 2.4.3)
-      mongoid (~> 5.0.0)
-      mongoid-tree (~> 2.0.0)
-      nokogiri (~> 1.10.3)
-      protected_attributes (~> 1.0.5)
-      rest-client (~> 2.0.1)
-      rubyzip (~> 1.2.1)
-      uuid (~> 2.3.7)
-      zip-zip (~> 0.3)
+    hashdiff (1.0.0.beta1)
     highline (1.7.10)
-    hike (1.2.3)
-    hqmf2js (1.4.0)
-      health-data-standards (~> 4.0)
-      hquery-patient-api (~> 1.1)
-      rails (~> 4.2)
-    hquery-patient-api (1.1.1)
-      coffee-script (~> 2.4)
-      libv8 (~> 3.16.14)
-      sprockets (~> 2.2)
-      therubyracer (~> 0.12)
-      tilt (~> 1.4)
-      uglifier (~> 2.7)
     htmlentities (4.3.4)
-    http-cookie (1.0.3)
-      domain_name (~> 0.5)
-    i18n (0.9.5)
+    i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     iniparse (1.4.4)
     jaro_winkler (1.5.2)
-    jquery-rails (4.3.3)
+    jquery-rails (4.3.5)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.1.0)
+    json (2.2.0)
     kwalify (0.7.2)
     less (2.6.0)
       commonjs (~> 0.2.7)
@@ -282,90 +204,78 @@ GEM
     loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    macaddr (1.7.1)
-      systemu (~> 2.6.2)
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
+    marcel (0.3.3)
+      mimemagic (~> 0.3.2)
     maruku (0.7.3)
     memoist (0.9.3)
     method_source (0.9.2)
-    mime-types (3.2.2)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2019.0331)
     mimemagic (0.3.3)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
-    momentjs-rails (2.20.1)
-      railties (>= 3.1)
-    mongo (2.4.3)
-      bson (>= 4.2.1, < 5.0.0)
-    mongoid (5.0.2)
-      activemodel (~> 4.0)
-      mongo (~> 2.1)
-      origin (~> 2.1)
-      tzinfo (>= 0.3.37)
-    mongoid-compatibility (0.5.1)
-      activesupport
-      mongoid (>= 2.0)
-    mongoid-tree (2.0.1)
-      mongoid (>= 4.0, < 6.0)
+    mongo (2.8.0)
+      bson (>= 4.4.2, < 5.0.0)
+    mongoid (6.4.4)
+      activemodel (>= 5.1, < 6.0.0)
+      mongo (>= 2.5.1, < 3.0.0)
+    mongoid-tree (2.1.1)
+      mongoid (>= 4.0, < 8)
     multi_json (1.13.1)
     mustache (1.1.0)
-    net-scp (1.2.1)
-      net-ssh (>= 2.6.5)
-    net-ssh (5.1.0)
-    netrc (0.11.0)
-    newrelic_rpm (6.0.0.351)
+    net-scp (2.0.0)
+      net-ssh (>= 2.6.5, < 6.0.0)
+    net-ssh (5.2.0)
+    newrelic_rpm (6.4.0.356)
+    nio4r (2.3.1)
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.7.8)
-    origin (2.3.1)
+    oj (3.7.12)
     orm_adapter (0.5.0)
-    overcommit (0.46.0)
+    overcommit (0.48.1)
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
-    parallel (1.13.0)
-    parser (2.6.0.0)
+    parallel (1.17.0)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
-    powerpack (0.1.2)
-    protected_attributes (1.0.9)
-      activemodel (>= 4.0.1, < 5.0)
+    protected_attributes_continued (1.4.0)
+      activemodel (>= 5.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    pry-byebug (3.6.0)
-      byebug (~> 10.0)
+    pry-byebug (3.7.0)
+      byebug (~> 11.0)
       pry (~> 0.10)
     psych (3.1.0)
-    public_suffix (3.0.3)
-    quality-measure-engine (3.2.0)
-      delayed_job_mongoid (~> 2.2)
-      mongoid (~> 5.0)
-      rubyzip (~> 1.0)
-      zip-zip (~> 0.3)
-    rack (1.6.11)
-    rack-test (0.6.3)
-      rack (>= 1.0)
-    rails (4.2.11.1)
-      actionmailer (= 4.2.11.1)
-      actionpack (= 4.2.11.1)
-      actionview (= 4.2.11.1)
-      activejob (= 4.2.11.1)
-      activemodel (= 4.2.11.1)
-      activerecord (= 4.2.11.1)
-      activesupport (= 4.2.11.1)
-      bundler (>= 1.3.0, < 2.0)
-      railties (= 4.2.11.1)
-      sprockets-rails
-    rails-deprecated_sanitizer (1.0.3)
-      activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.9)
-      activesupport (>= 4.2.0, < 5.0)
-      nokogiri (~> 1.6)
-      rails-deprecated_sanitizer (>= 1.0.1)
+    public_suffix (3.1.0)
+    rack (2.0.7)
+    rack-test (1.1.0)
+      rack (>= 1.0, < 3)
+    rails (5.2.3)
+      actioncable (= 5.2.3)
+      actionmailer (= 5.2.3)
+      actionpack (= 5.2.3)
+      actionview (= 5.2.3)
+      activejob (= 5.2.3)
+      activemodel (= 5.2.3)
+      activerecord (= 5.2.3)
+      activestorage (= 5.2.3)
+      activesupport (= 5.2.3)
+      bundler (>= 1.3.0)
+      railties (= 5.2.3)
+      sprockets-rails (>= 2.0.0)
+    rails-controller-testing (1.0.4)
+      actionpack (>= 5.0.1.x)
+      actionview (>= 5.0.1.x)
+      activesupport (>= 5.0.1.x)
+    rails-dom-testing (2.0.3)
+      activesupport (>= 4.2.0)
+      nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
     rails_best_practices (1.19.4)
@@ -376,14 +286,15 @@ GEM
       json
       require_all (~> 2.0)
       ruby-progressbar
-    railties (4.2.11.1)
-      actionpack (= 4.2.11.1)
-      activesupport (= 4.2.11.1)
+    railties (5.2.3)
+      actionpack (= 5.2.3)
+      activesupport (= 5.2.3)
+      method_source
       rake (>= 0.8.7)
-      thor (>= 0.18.1, < 2.0)
+      thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     rake (12.3.2)
-    reek (5.3.1)
+    reek (5.4.0)
       codeclimate-engine-rb (~> 0.4.0)
       kwalify (~> 0.7.0)
       parser (>= 2.5.0.0, < 2.7, != 2.5.1.1)
@@ -394,48 +305,38 @@ GEM
     responders (2.4.1)
       actionpack (>= 4.2.0, < 6.0)
       railties (>= 4.2.0, < 6.0)
-    rest-client (2.0.2)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     roo (2.8.2)
       nokogiri (~> 1)
       rubyzip (>= 1.2.1, < 2.0.0)
-    rubocop (0.64.0)
+    rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.5, != 2.5.1.1)
-      powerpack (~> 0.1)
+      parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (~> 1.4.0)
-    ruby-progressbar (1.10.0)
-    rubyzip (1.2.2)
+      unicode-display_width (>= 1.4.0, < 1.7)
+    ruby-progressbar (1.10.1)
+    rubyzip (1.2.3)
     rvm1-capistrano3 (1.4.0)
       capistrano (~> 3.0)
       sshkit (>= 1.2)
-    safe_yaml (1.0.4)
-    selenium-webdriver (3.141.0)
-      childprocess (~> 0.5)
+    safe_yaml (1.0.5)
+    selenium-webdriver (3.142.3)
+      childprocess (>= 0.5, < 2.0)
       rubyzip (~> 1.2, >= 1.2.2)
-    sexp_processor (4.11.0)
+    sexp_processor (4.12.1)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    simplexml_parser (1.0.1)
-      health-data-standards (~> 4.0)
-      tilt (~> 1.4)
-    sprockets (2.12.5)
-      hike (~> 1.2)
-      multi_json (~> 1.0)
-      rack (~> 1.0)
-      tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.3.3)
-      actionpack (>= 3.0)
-      activesupport (>= 3.0)
-      sprockets (>= 2.8, < 4.0)
+    sprockets (3.7.2)
+      concurrent-ruby (~> 1.0)
+      rack (> 1, < 3)
+    sprockets-rails (3.2.1)
+      actionpack (>= 4.0)
+      activesupport (>= 4.0)
+      sprockets (>= 3.0.0)
     sshkit (1.18.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
@@ -453,7 +354,7 @@ GEM
       rack (>= 1, < 3)
     thor (0.19.4)
     thread_safe (0.3.6)
-    tilt (1.4.1)
+    tilt (2.0.9)
     typhoeus (1.3.1)
       ethon (>= 0.9.0)
     tzinfo (1.2.5)
@@ -461,25 +362,25 @@ GEM
     uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.7.6)
-    unicode-display_width (1.4.1)
+    unicode-display_width (1.6.0)
     url (0.3.2)
     uuid (2.3.9)
       macaddr (~> 1.0)
-    vcr (4.0.0)
+    vcr (5.0.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    warden (1.2.7)
-      rack (>= 1.0)
+    warden (1.2.8)
+      rack (>= 2.0.6)
     webmock (2.3.2)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
+    websocket-driver (0.7.1)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.4)
     zip-zip (0.3)
       rubyzip (>= 1.0.0)
 
@@ -487,9 +388,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  apipie-rails!
+  apipie-rails
   axlsx!
-  bonnie_bundler!
   brakeman
   browser
   bundler-audit
@@ -497,8 +397,6 @@ DEPENDENCIES
   codecov
   coffee-rails
   colorize
-  cql_qdm_patientapi!
-  cqm-converter!
   cqm-models!
   cqm-parsers!
   devise
@@ -507,24 +405,21 @@ DEPENDENCIES
   exception_notification!
   foreman
   handlebars_assets (= 0.16)
-  health-data-standards (~> 4.3.5)
-  hqmf2js (~> 1.4)
-  hquery-patient-api (~> 1.1)
-  jquery-rails
+  hashdiff (>= 1.0.0.beta1, < 2.0.0)
+  jquery-rails (~> 4.3.3)
   less-rails
   maruku
   minitest
-  mongoid
+  mongoid (~> 6.4.2)
   multi_json
   newrelic_rpm
   non-stupid-digest-assets
   oj
   overcommit
-  protected_attributes
   pry
   pry-byebug
-  quality-measure-engine (~> 3.2)
-  rails (~> 4.2.11)
+  rails (~> 5.0)
+  rails-controller-testing
   rails_best_practices
   reek
   roo (~> 2.7)
@@ -533,8 +428,7 @@ DEPENDENCIES
   rvm1-capistrano3
   selenium-webdriver
   simplecov
-  simplexml_parser (~> 1.0)
-  sprockets (~> 2.8)
+  sprockets (~> 3.0)
   sprockets-rails
   systemu
   teaspoon
