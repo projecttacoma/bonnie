@@ -154,14 +154,6 @@ class FrontendFixtureExporter < FixtureExporter
     super(user, measure: measure, records: records)
   end
 
-  def export_records_as_array(path)
-    @records = @records.map { |record| CQMConverter.to_cqm(record) }
-    super(path)
-  end
-
-  # Alias must be placed after the export_records_as_array method so super method won't be called first
-  alias export_records export_records_as_array
-
   def make_hash_and_apply_any_transforms(mongoid_doc)
     return JSON.parse(mongoid_doc.as_json(include: :_type, methods: :_type).to_json, max_nesting: 1000)
   end
@@ -176,8 +168,6 @@ end
 # Used to export fixtures for use in backend tests (where fixtures are loaded into mongo)
 class BackendFixtureExporter < FixtureExporter
   alias export_value_sets export_value_sets_as_array
-  alias export_records export_records_as_individual_files
-
   def make_hash_and_apply_any_transforms(mongoid_doc)
     doc = mongoid_doc.as_json(include: :_type, methods: :_type)
 

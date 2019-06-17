@@ -37,8 +37,6 @@
 #= require costanza/js/costanza
 #= require costanza/thorax
 #
-#= require cql_qdm_patientapi
-#
 #= require helpers
 #= require_tree ./templates
 #= require_tree ./models
@@ -48,7 +46,6 @@
 #= require cqm_calculator
 #= require calculator_selector
 #= require router
-#= require measure_libraries
 #= require_self
 #= require_tree .
 

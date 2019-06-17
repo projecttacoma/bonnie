@@ -6,88 +6,6 @@ require_relative '../util/cql_to_elm_helper'
 namespace :bonnie do
   namespace :fixtures do
     ###
-    # Generates a set of front end fixtures representing a specific database state.
-    #
-    # cms_hqmf: indicates if a CMS id or an HQMF id is used.
-    #   values: cms, hqmf
-    # path: Path to fixture files, derived from the data-type directories (EX: measure_data/${path}).
-    # user_email: email of user to export.  Measure and patients exported will be taken from this user account.
-    # measure_id: id of measure to export, taken from account of given user.
-    # patient_first_name: if a specific patient is desired, include a first_name and last_name.  If all patients are desired, set to nil
-    # patient_last_name: if a specific patient is desired, include a first_name and last_name.  If all patients are desired, set to nil
-    #
-    # e.g., bundle exec rake bonnie:fixtures:generate_frontend_cql_fixtures[cms,test/fake,bonnie@test.org,CMS68v5,nil,nil]
-    task :generate_frontend_cql_fixtures, [:cms_hqmf, :path, :user_email, :measure_id, :patient_first_name, :patient_last_name] => [:environment] do |t, args|
-      fixtures_path = File.join('spec', 'javascripts', 'fixtures', 'json')
-      measure_file_path = File.join(fixtures_path, 'cqm_measure_data', args[:path])
-      record_file_path = File.join(fixtures_path, 'cqm_patients', args[:path])
-
-      user = User.find_by email: args[:user_email]
-      cqm_measure = get_cqm_measure(user, args[:cms_hqmf], args[:measure_id])
-      records = Record.by_user_and_hqmf_set_id(user, cqm_measure.hqmf_set_id)
-      if (args[:patient_first_name].present? && args[:patient_last_name].present?)
-        records = records.select { |r| r.first == args[:patient_first_name] && r.last == args[:patient_last_name] }
-      end
-
-      fixture_exporter = FrontendFixtureExporter.new(user, measure: cqm_measure, records: records)
-      fixture_exporter.export_measure_and_any_components(measure_file_path)
-      fixture_exporter.export_value_sets(measure_file_path)
-      fixture_exporter.export_records(record_file_path)
-    end
-
-    desc %{Export backend cqm fixtures for a given user account
-    example: bundle exec rake bonnie:fixtures:generate_backend_cqm_fixtures[bonnie-fixtures@mitre.org]}
-    task :generate_backend_cqm_fixtures, [:user_email] => [:environment] do |t, args|
-      fixtures_path = File.join('test', 'fixtures')
-
-      user = User.find_by email: args[:user_email]
-      CQM::Measure.by_user(user).each do |measure|
-        patients = CQM::Patient.by_user_and_hqmf_set_id(user, measure.hqmf_set_id)
-
-        measure_file_path = File.join(fixtures_path, 'measures', measure.cms_id, 'cqm_measures')
-        patient_file_path = File.join(fixtures_path, 'cqm_patients', measure.cms_id)
-        measure_package_path = File.join(fixtures_path, 'measures', measure.cms_id, 'cqm_measure_packages')
-        value_sets_path = File.join(fixtures_path, 'measures', measure.cms_id, 'cqm_value_sets')
-
-        fixture_exporter = BackendFixtureExporter.new(user, measure: measure, records: patients)
-        fixture_exporter.export_measure_and_any_components(measure_file_path)
-        fixture_exporter.try_export_measure_package(measure_package_path)
-        fixture_exporter.export_value_sets(value_sets_path)
-        fixture_exporter.export_records(patient_file_path)
-      end
-    end
-
-    ###
-    # Generates a set of back end fixtures representing a specific database state.
-    # Generated fixtures will be associated with
-    #
-    # cms_hqmf: indicates if a CMS id or an HQMF id is used.
-    #   values: cms, hqmf
-    # path: Path to fixture files, derived from the data-type directories (EX: measure_data/${path}).
-    # user_email: email of user to export.  Measure and patients exported will be taken from this user account.
-    # measure_id: id of measure to export, taken from account of given user.
-    #
-    # e.g., bundle exec rake bonnie:fixtures:generate_backend_cql_fixtures[cms,test/fake,bonnie@test.org,CMS68v5]
-    desc "Exports a set of fixtures that can be loaded for testing purposes"
-    task :generate_backend_cql_fixtures, [:cms_hqmf, :path, :user_email, :measure_id] => [:environment] do |t, args|
-      fixtures_path = File.join('test', 'fixtures')
-      measure_file_path = File.join(fixtures_path, 'cql_measures', args[:path])
-      record_file_path = File.join(fixtures_path, 'records', args[:path])
-      measure_package_path = File.join(fixtures_path, 'cql_measure_packages', args[:path])
-      value_sets_path = File.join(fixtures_path, 'health_data_standards_svs_value_sets', args[:path])
-
-      user = User.find_by email: args[:user_email]
-      measure = get_cqm_measure(user, args[:cms_hqmf], args[:measure_id])
-      records = CQM::Patient.by_user_and_hqmf_set_id(user, measure.hqmf_set_id)
-
-      fixture_exporter = BackendFixtureExporter.new(user, measure: measure, records: records)
-      fixture_exporter.export_measure_and_any_components(measure_file_path)
-      fixture_exporter.try_export_measure_package(measure_package_path)
-      fixture_exporter.export_value_sets(value_sets_path)
-      fixture_exporter.export_records(record_file_path)
-    end
-
-    ###
     # Takes a set of valueset json files, creates a dictionary of oid to valueset
     #
     # fileset_dir: directory containing input filesd.
@@ -146,38 +64,6 @@ namespace :bonnie do
       fixture_exporter.export_measure_and_any_components(File.join(fixture_path,'cqm_measures'))
       fixture_exporter.export_value_sets(File.join(fixture_path,'cqm_value_sets'))
       fixture_exporter.try_export_measure_package(File.join(fixture_path,'cqm_measure_packages'))
-    end
-
-    desc %{Export patient fixtures for a given account. Uses vsac credentials from environmental vars.
-      Exports into test/fixtures/cqm_patients/<CMS_ID> and spec/javascripts/fixtures/json/cqm_patients/<CMS_ID>
-      example: bundle exec rake bonnie:fixtures:generate_cqm_patient_fixtures_from_cql_patients[bonnie-fixtures@mitre.org]}
-    task :generate_cqm_patient_fixtures_from_cql_patients, [:email] => [:environment] do |task, args|
-      email = args[:email]
-      user = User.find_by email: args[:email]
-      cms_ids = {}
-      failed_exports = []
-      CqlMeasure.by_user(user).each do |measure|
-        Record.where(measure_ids: measure.hqmf_set_id, user_id: BSON::ObjectId.from_string(user.id)).each do |record|
-          begin
-            patient = CQMConverter.to_cqm(record)
-            patient._id = record._id if record._id
-
-            backend_fixture_exporter = BackendFixtureExporter.new(user, measure: measure, records: [patient])
-            backend_fixture_path = File.join('test', 'fixtures', 'cqm_patients', measure.cms_id)
-            backend_fixture_exporter.export_records_as_individual_files(backend_fixture_path)
-
-            frontend_fixture_exporter = FrontendFixtureExporter.new(user, measure: measure, records: [patient])
-            frontend_fixture_path = File.join('spec', 'javascripts', 'fixtures', 'json', 'patients', measure.cms_id)
-            frontend_fixture_exporter.export_records_as_individual_files(frontend_fixture_path)
-          rescue StandardError => e
-            failed_exports << "measure.hqmf_set_id: #{measure.hqmf_set_id}\n\trecord._id: #{record._id}\n\terror: #{e}"
-          end
-        end
-      end
-      unless failed_exports.empty?
-        puts "Failed to export the following patients:"
-        failed_exports.each {|failed_export| puts failed_export }
-      end
     end
 
     def get_cqm_measure(user, cms_hqmf, measure_id)

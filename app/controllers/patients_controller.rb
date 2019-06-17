@@ -1,5 +1,5 @@
 class PatientsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
 
   def update
     old_patient = CQM::Patient.by_user(current_user).find(params[:_id])

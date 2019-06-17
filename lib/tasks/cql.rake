@@ -123,49 +123,7 @@ namespace :bonnie do
       differences
     end
 
-    desc %{Converts Bonnie measures to new CQM Measures
-      user email is optional and can be passed in by EMAIL
-      If no email is provided, rake task will run on all measures
-    $ rake bonnie:cql:convert_measures EMAIL=xxx}
-    task :convert_measures => :environment do
-      user = User.find_by email: ENV["EMAIL"] if ENV["EMAIL"]
-      raise StandardError.new("Could not find user #{ENV["EMAIL"]}.") if ENV["EMAIL"] && user.nil?
-      bonnie_cql_measures = user ? CqlMeasure.by_user(user) : CqlMeasure.all
-
-      fail_count = 0
-      puts "**** Starting to convert measures! ****\n\n"
-      bonnie_cql_measures.each do |measure|
-        begin
-          cqm_measure = CQM::Converter::BonnieMeasure.to_cqm(measure)
-          cqm_measure.value_sets.map(&:save!)
-          cqm_measure.user = measure.user
-          cqm_measure.save!
-          # Verify Measure was converted properly
-          diff = measure_conversion_diff(measure, cqm_measure)
-          if diff.empty?
-            print ".".green
-          else
-            puts "\nConversion Difference".yellow
-            measure_user = User.find_by(_id: measure[:user_id])
-            puts "Measure #{measure.cms_id}: #{measure.title} with id #{measure._id} in account #{measure_user.email}".light_blue
-            diff.each_entry do |element|
-              puts "--- #{element} --- Is different from CQL measure".light_blue
-            end
-            fail_count += 1
-          end
-        rescue StandardError => e
-          fail_count += 1
-          puts "\nMeasure  #{measure.title} #{measure.cms_id} with id #{measure._id} failed with message: #{e.message}".red
-        rescue ExecJS::ProgramError => e
-          fail_count += 1
-          # if there was a conversion failure we should record the resulting failure message with the measure
-          puts "\nMeasure  #{measure.title} #{measure.cms_id} with id #{measure._id} failed with message: #{e.message}".red
-        end
-      end
-      puts "\n**** Done converting ****"
-      puts "Successful Conversions: #{bonnie_cql_measures.count - fail_count}"
-      puts "Unsuccessful/Failed Conversions: #{fail_count}"
-    end
+  
 
     def self.measure_conversion_diff(cql_measure, cqm_measure)
       differences = []
@@ -211,38 +169,6 @@ namespace :bonnie do
       end
 
       differences
-    end
-
-    desc %{Coverts Bonnie patients to new CQM/QDM Patients
-      user email is optional and can be passed in by EMAIL
-      If no email is provided, rake task will run on all patients
-    $ rake bonnie:cql:convert_patients EMAIL=xxx}
-    task :convert_patients => :environment do
-      user = User.find_by email: ENV["EMAIL"] if ENV["EMAIL"]
-      raise StandardError.new("Could not find user #{ENV["EMAIL"]}.") if ENV["EMAIL"] && user.nil?
-      bonnie_patients = user ? Record.by_user(user) : Record.all
-      count = 0
-      bonnie_patients.no_timeout.each do |bonnie_patient|
-        begin
-          cqm_patient = CQMConverter.to_cqm(bonnie_patient)
-          cqm_patient.user = bonnie_patient.user
-          cqm_patient.save!
-          count += 1
-        rescue ExecJS::ProgramError, StandardError => e
-          # if there was a conversion failure we should record the resulting failure message with the hds model in a
-          # separate collection to return
-          user = User.find_by _id: bonnie_patient.user_id
-          if bonnie_patient.measure_ids.first.nil?
-            puts "#{user.email}\n  Measure: N/A\n  Patient: #{bonnie_patient._id}\n  Conversion failed with message: #{e.message}".light_red
-          elsif CQM::Measure.where(hqmf_set_id: bonnie_patient.measure_ids.first, user_id: bonnie_patient.user_id).first.nil?
-            puts "#{user.email}\n  Measure (hqmf_set_id): #{bonnie_patient.measure_ids.first}\n  Patient: #{bonnie_patient._id}\n  Conversion failed with message: #{e.message}".light_red
-          else
-            measure = CQM::Measure.where(hqmf_set_id: bonnie_patient.measure_ids.first, user_id: bonnie_patient.user_id).first
-            puts "#{user.email}\n  Measure: #{measure.title} #{measure.cms_id}\n  Patient: #{bonnie_patient._id}\n  Conversion failed with message: #{e.message}".light_red
-          end
-        end
-      end
-      puts count
     end
 
     desc %{Outputs user accounts that have cql measures and which measures are cql in their accounts.
