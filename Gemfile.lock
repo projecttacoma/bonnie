@@ -36,8 +36,8 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-converter
-  revision: c1ac4080fe027335ef0ae82a5f8749cadb8b0ef8
-  branch: master
+  revision: 408b497dbf37487ebd9d6204ad508fb082ccbbfa
+  branch: codesystemoid
   specs:
     cqm-converter (1.0.3)
       activesupport
@@ -49,8 +49,8 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-models
-  revision: 4a4f6c7f371eea55d521354963a1bf661a2216f2
-  branch: master
+  revision: 4090a5aa2c7cb5cffce40e3c096d45c9f61dc81c
+  branch: codesystemoid
   specs:
     cqm-models (1.1.1.0)
 

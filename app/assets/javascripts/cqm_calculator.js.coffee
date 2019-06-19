@@ -118,9 +118,11 @@
 
         populationSetId = population.get('population_set_id')
         populationSetResults = patientResults[populationSetId]
+        if !populationSetResults.observation_values
+          populationSetResults.observation_values = []
         populationSetResults.observation_values.sort()
 
-        result.set(populationSetResults.toObject())
+        result.set(populationSetResults)
         result.state = 'complete'
 
         console.log "finished calculation of #{cqmMeasure.cms_id} - #{patient.getFirstName()} #{patient.getLastName()}"
