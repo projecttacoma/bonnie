@@ -36,17 +36,18 @@
       measure.get('populations').forEach((measure_population) =>
         populationSetId = measure_population.get('population_set_id')
         populationSetResults = patientResults[populationSetId]
-
+        if !populationSetResults.observation_values
+          populationSetResults.observation_values = []
         populationSetResults.observation_values.sort()
         # if this population is requested update the object
         if measure_population == population
-          result.set(populationSetResults.toObject())
+          result.set(populationSetResults)
           result.state = 'complete'
         # otherwise create result and put it on the cache
         else
           otherPopCacheKey = @cacheKey(measure_population, patient)
           otherPopResult = @resultsCache[otherPopCacheKey] ?= new Thorax.Models.Result({}, population: measure_population, patient: patient)
-          otherPopResult.set(populationSetResults.toObject())
+          otherPopResult.set(populationSetResults)
           otherPopResult.state = 'complete'
 
         console.log "finished calculation of #{cqmMeasure.cms_id} - #{patient.getFirstName()} #{patient.getLastName()}"
