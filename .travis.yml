@@ -24,7 +24,6 @@ before_script:
   - wget http://chromedriver.storage.googleapis.com/2.44/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip -d /tmp/chromedriver
   - export PATH=$PATH:/tmp/chromedriver
-  - bundle exec rake teaspoon dir=integration
   - bundle exec rake teaspoon dir=models
   - bash <(curl -s https://codecov.io/bash) -cF coffeeScript1
   - bundle exec rake teaspoon dir=integration
