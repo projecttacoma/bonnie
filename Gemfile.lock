@@ -72,7 +72,7 @@ GIT
 
 GIT
   remote: https://github.com/projecttacoma/cqm-reports
-  revision: 9738108375cd16bbfde0ef2a0f9285e2b30ae94a
+  revision: 73a0fed59ee6531416fe1eb6053f6871a0058bea
   branch: bonnie_export
   specs:
     cqm-reports (1.0.0.0)
