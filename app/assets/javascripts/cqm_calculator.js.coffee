@@ -9,7 +9,7 @@
     options.doPretty = true # force doPretty to true
     # We store both the calculation result and the calcuation code based on keys derived from the arguments
     cacheKey = @cacheKey(population, patient, options)
-    calcKey = @calculationKey(population)
+    calcKey = @calculationKey(population, options)
     # We only ever generate a single result for a population / patient pair; if we've ever generated a
     # result for this pair, we use that result and return it, starting its calculation if needed
     result = @resultsCache[cacheKey] ?= new Thorax.Models.Result({}, population: population, patient: patient)

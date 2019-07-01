@@ -6,14 +6,14 @@
     @resultsCache = {}
 
   # Key for storing calculators on a population
-  calculationKey: (population) -> "#{population.measure().id}/#{population.get('index')}"
+  calculationKey: (population, options = {}) -> "#{population.measure().id}/#{population.get('index')}/#{JSON.stringify(options)}"
 
   # Key for storing results for a patient / population calculation; we use the CID for the patient portion
   # of the key so that clones can have different calculation results
-  cacheKey: (population, patient, options) -> "#{@calculationKey(population)}/#{patient.cid}/#{JSON.stringify(options)}"
+  cacheKey: (population, patient, options = {}) -> "#{@calculationKey(population, options)}/#{patient.cid}"
 
   # Utility function for setting the calculator function for a population, used in the calculator loading JS
-  setCalculator: (population, calcFunction) -> @calculator[@calculationKey(population)] = calcFunction
+  setCalculator: (population, calcFunction, options = {}) -> @calculator[@calculationKey(population, options)] = calcFunction
 
   # Cancel all pending calculations; this just marks the result as 'cancelled', the actual stopping of the calculation is
   # handled in the deferred calculation code
