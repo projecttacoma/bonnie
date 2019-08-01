@@ -36,6 +36,21 @@ GIT
       zip-zip (~> 0.3)
 
 GIT
+  remote: https://github.com/projecttacoma/cqm-reports
+  revision: c7e4c9ef6dad3d5f9d7ec76d70586fcdaa58d22a
+  branch: 2019-standards-update
+  specs:
+    cqm-reports (2.0.1)
+      erubis (~> 2.7)
+      log4r (~> 1.1)
+      memoist (~> 0.9)
+      mongoid-tree (> 2.0)
+      mustache
+      nokogiri (~> 1.10)
+      uuid (~> 2.3)
+      zip-zip (~> 0.3)
+
+GIT
   remote: https://github.com/randym/axlsx
   revision: c593a08b2a929dac7aa8dc418b55e26b4c49dc34
   branch: master
@@ -412,6 +427,7 @@ DEPENDENCIES
   colorize
   cqm-models!
   cqm-parsers!
+  cqm-reports!
   devise
   doorkeeper (~> 4.4.0)
   doorkeeper-mongodb (~> 4.1.0)
@@ -424,6 +440,7 @@ DEPENDENCIES
   minitest
   mongoid
   multi_json
+  mustache
   newrelic_rpm
   non-stupid-digest-assets
   oj

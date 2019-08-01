@@ -15,8 +15,12 @@ gem "non-stupid-digest-assets"
 
 # gem 'cqm-parsers', '~> 0.2.1'
 
+# needed for cqm-reports
+gem 'mustache'
+
 gem 'cqm-parsers', :git => 'https://github.com/projecttacoma/cqm-parsers', :branch => '2019-standards-update'
 gem 'cqm-models', :git => 'https://github.com/projecttacoma/cqm-models', :branch => '2019-standards-update'
+gem 'cqm-reports', :git => 'https://github.com/projecttacoma/cqm-reports', :branch => '2019-standards-update'
 
 # gem 'cqm-parsers', :path => '../cqm-parsers'
 # gem 'cqm-models', :path => '../cqm-models'
