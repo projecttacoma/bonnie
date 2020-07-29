@@ -47,6 +47,8 @@ class PatientsController < ApplicationController
       measure = CQM::Measure.by_user(current_user).where({:hqmf_set_id => params[:hqmf_set_id]})
     end
 
+    p patients.size
+
     qrda_errors = {}
     html_errors = {}
 
