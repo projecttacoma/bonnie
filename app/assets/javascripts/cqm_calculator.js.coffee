@@ -32,31 +32,35 @@
 
     # attempt calcuation
     try
-      cqmResults = cqm.execution.Calculator.calculate(cqmMeasure, [cqmPatient], cqmValueSets, { doPretty: options.doPretty, includeClauseResults: true, requestDocument: false })
-      patientResults = cqmResults[patient.get('cqmPatient').id.toString()]
+      cqmMeasure.measure_period = {
+        low: {value: new Date},
+        high: {value: new Date}
+      }
+      # cqmResults = cqm.execution.Calculator.calculate(cqmMeasure, [cqmPatient], cqmValueSets, { doPretty: options.doPretty, includeClauseResults: true, requestDocument: false })
+      # patientResults = cqmResults[patient.get('cqmPatient').id.toString()]
 
-      measure.get('populations').forEach((measure_population) =>
-        populationSetId = measure_population.get('population_set_id')
-        populationSetResults = patientResults[populationSetId]
+      # measure.get('populations').forEach((measure_population) =>
+      #   populationSetId = measure_population.get('population_set_id')
+      #   populationSetResults = patientResults[populationSetId]
 
-        if populationSetResults.observation_values
-          populationSetResults.observation_values.sort()
-        else
-          populationSetResults.observation_values = []
+      #   if populationSetResults.observation_values
+      #     populationSetResults.observation_values.sort()
+      #   else
+      #     populationSetResults.observation_values = []
 
-        # if this population is requested update the object
-        if measure_population == population
-          result.set(populationSetResults)
-          result.state = 'complete'
-        # otherwise create result and put it on the cache
-        else
-          otherPopCacheKey = @cacheKey(measure_population, patient, options)
-          otherPopResult = @resultsCache[otherPopCacheKey] ?= new Thorax.Models.Result({}, population: measure_population, patient: patient)
-          otherPopResult.set(populationSetResults)
-          otherPopResult.state = 'complete'
+      #   # if this population is requested update the object
+      #   if measure_population == population
+      #     result.set(populationSetResults)
+      #     result.state = 'complete'
+      #   # otherwise create result and put it on the cache
+      #   else
+      #     otherPopCacheKey = @cacheKey(measure_population, patient, options)
+      #     otherPopResult = @resultsCache[otherPopCacheKey] ?= new Thorax.Models.Result({}, population: measure_population, patient: patient)
+      #     otherPopResult.set(populationSetResults)
+      #     otherPopResult.state = 'complete'
 
-        console.log "finished calculation of #{cqmMeasure.cms_id} - #{patient.getFirstName()} #{patient.getLastName()}"
-      )
+      #   console.log "finished calculation of #{cqmMeasure.cms_id} - #{patient.getFirstName()} #{patient.getLastName()}"
+      # )
     catch error
       console.log(error)
       @clearResult(population, patient, options)

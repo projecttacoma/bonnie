@@ -237,11 +237,12 @@ class Thorax.Collections.SourceDataCriteria extends Thorax.Collection
     dataElementsAsObjects = []
 
     # TODO: Replace quick and dirty option
-    dataElements.forEach (dataElement) ->
-      if !Thorax.Collections.SourceDataCriteria.SKIP_TYPES.includes(dataElement._type)
-        dataElementAsObject = dataElement.toObject()
-        dataElementAsObject.qdmDataElement = dataElement
-        dataElementsAsObjects.push(dataElementAsObject)
+    # dataElements.forEach (dataElement) ->
+      # if !Thorax.Collections.SourceDataCriteria.SKIP_TYPES.includes(dataElement._type)
+        # dataElementAsObject = dataElement.toObject()
+        # dataElementAsObject.qdmDataElement = dataElement
+        # dataElementsAsObjects.push(dataElementAsObject)
+        # dataElementsAsObjects.push({qdmDataElement: dataElement})
 
     return dataElementsAsObjects
 

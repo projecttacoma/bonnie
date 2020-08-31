@@ -20,8 +20,8 @@ class Thorax.Views.ExpectedValuesView extends Thorax.Views.BonnieView
 
   populationContext: (expectedValue) ->
     population = @measure.get('populations').at expectedValue.get('population_index')
-    populationTitle: population.get('title') || population.get('sub_id')
-    population_index: expectedValue.get('population_index')
+    populationTitle: "fake title"#population.get('title') || population.get('sub_id')
+    population_index: 0#expectedValue.get('population_index')
 
   refresh: (population, expectedValues) ->
     @measure = population.collection.parent
