@@ -7,31 +7,32 @@ class Thorax.Models.Patient extends Thorax.Model
 
     # cqmPatient will already exist if we are cloning the thoraxModel
     if attrs.cqmPatient?
-      thoraxPatient.cqmPatient = new cqm.models.Patient(attrs.cqmPatient)
-      thoraxPatient.cqmPatient.qdmPatient.extendedData = attrs.cqmPatient.qdmPatient.extendedData
+      thoraxPatient.cqmPatient = new cqm.models.CqmPatient(attrs.cqmPatient)
+      # thoraxPatient.cqmPatient.qdmPatient.extendedData = attrs.cqmPatient.qdmPatient.extendedData
     else
-      thoraxPatient.cqmPatient = new cqm.models.Patient(attrs)
+      thoraxPatient.cqmPatient = new cqm.models.CqmPatient(attrs)
     # TODO: look into adding this into cqmPatient construction
-    if !thoraxPatient.cqmPatient.qdmPatient
-      thoraxPatient.cqmPatient.qdmPatient = new cqm.models.QDMPatient()
+    if !thoraxPatient.cqmPatient.fhir_patient
+      thoraxPatient.cqmPatient.fhir_patient = new cqm.models.Patient()
     thoraxPatient._id = attrs._id
-    thoraxPatient.expired = (thoraxPatient.cqmPatient.qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'expired').length > 0
-    thoraxPatient.source_data_criteria = new Thorax.Collections.SourceDataCriteria(thoraxPatient.cqmPatient.qdmPatient.dataElements, parent: this, parse: true)
-    thoraxPatient.expected_values = new Thorax.Collections.ExpectedValues(thoraxPatient.cqmPatient.expectedValues, parent: this, parse: true)
+    thoraxPatient.expired = thoraxPatient.cqmPatient.fhir_patient.deceased
+    thoraxPatient.source_data_criteria = new Thorax.Collections.SourceDataCriteria(thoraxPatient.cqmPatient.data_elements, parent: this, parse: true)
+    thoraxPatient.expected_values = new Thorax.Collections.ExpectedValues(thoraxPatient.cqmPatient.expected_values, parent: this, parse: true)
     thoraxPatient
 
   # Create a deep clone of the patient, optionally omitting the id field
   deepClone: (options = {}) ->
     clonedPatient = @.clone()
     # clone the cqmPatient and make a new source_data_criteria collection for it
-    clonedPatient.set 'cqmPatient', new cqm.models.Patient(mongoose.utils.clone(clonedPatient.get('cqmPatient')))
-    if options.new_id then clonedPatient.get('cqmPatient')._id = new mongoose.Types.ObjectId()
-    clonedPatient.set '_id', clonedPatient.get('cqmPatient')._id.toString()
-    clonedPatient.set 'source_data_criteria', new Thorax.Collections.SourceDataCriteria(clonedPatient.get('cqmPatient').qdmPatient.dataElements, parent: clonedPatient, parse: true)
-    clonedPatient.set 'expected_values', new Thorax.Collections.ExpectedValues(clonedPatient.get('cqmPatient').expectedValues, parent: clonedPatient, parse: true)
+    clonedPatient.set 'cqmPatient', new cqm.models.CqmPatient(clonedPatient.get('cqmPatient'))
+    # clonedPatient.cqmPatient.set 'fhir_patient', new cqm.models.Patient(clonedPatient.get('cqmPatient').get('fhir_patient'))
+    if options.new_id then clonedPatient.get('cqmPatient')._id = "new mongoose.Types.ObjectId()"
+    clonedPatient.set '_id', "clonedPatient.get('cqmPatient')._id"
+    clonedPatient.set 'source_data_criteria', new Thorax.Collections.SourceDataCriteria(clonedPatient.get('cqmPatient').data_elements, parent: clonedPatient, parse: true)
+    clonedPatient.set 'expected_values', new Thorax.Collections.ExpectedValues(clonedPatient.get('cqmPatient').expected_values, parent: clonedPatient, parse: true)
     if options.dedupName
       clonedPatient.get('cqmPatient')['givenNames'][0] = bonnie.patients.dedupName(clonedPatient)
-    clonedPatient.set 'expired', (clonedPatient.get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'expired').length > 0
+    clonedPatient.set 'expired', clonedPatient.get('cqmPatient').expired
     clonedPatient
 
   getValidMeasureIds: (measures) ->
@@ -42,28 +43,28 @@ class Thorax.Models.Patient extends Thorax.Model
   getEntrySections: ->
     s for s in Thorax.Models.Patient.sections when @has(s)
   ### Patient HTML Header values ###
-  getBirthDate: -> @printDate @get('cqmPatient').qdmPatient.birthDatetime
-  getBirthTime: -> @printTime @get('cqmPatient').qdmPatient.birthDatetime
-  getDeathDate: -> if @get('expired') then @printDate((@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'expired')[0].expiredDatetime)
-  getDeathTime: -> if @get('expired') then @printTime((@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'expired')[0].expiredDatetime)
+  getBirthDate: -> @printDate @get('cqmPatient').fhir_patient?.birthDate
+  getBirthTime: -> @printTime @get('cqmPatient').fhir_patient?.birthDate
+  getDeathDate: -> if @get('expired') then @printDate(@get('cqmPatient').fhir_patient?.deceased)
+  getDeathTime: -> if @get('expired') then @printTime(@get('cqmPatient').fhir_patient?.deceased)
 
   # Next 4 methods return the Code object since some calls to them need the code while others need the display name
   getGender: ->
-    genderElement = (@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'gender')[0]
+    genderElement = @get('cqmPatient').fhir_patient?.gender
     unless genderElement? then return {code: "Unknown", display: "Unknown"}
     genderElement?.dataElementCodes[0]
   getRace: ->
-    raceElement = (@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'race')[0]
+    raceElement = null#(@get('cqmPatient').fhir_patient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'race')[0]
     unless raceElement? then return {code: "Unknown", display: "Unknown"}
     else unless raceElement.dataElementCodes[0].display? then "CDC-RE: #{raceElement.dataElementCodes[0].code}"
     else raceElement.dataElementCodes[0]
   getEthnicity: ->
-    ethnicityElement = (@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'ethnicity')[0]
+    ethnicityElement = null#(@get('cqmPatient').fhir_patient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'ethnicity')[0]
     unless ethnicityElement? then return {code: "Unknown", display: "Unknown"}
     else unless ethnicityElement.dataElementCodes[0].display? then "CDC-RE: #{ethnicityElement.dataElementCodes[0].code}"
     else ethnicityElement.dataElementCodes[0]
   getPayer: ->
-    payerElement = (@get('cqmPatient').qdmPatient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'payer')[0]
+    payerElement = null#(@get('cqmPatient').fhir_patient.patient_characteristics().filter (elem) -> elem.qdmStatus == 'payer')[0]
     unless payerElement? then return {code: "Unknown", display: "Unknown"}
     else unless payerElement.dataElementCodes[0].display? then "CDC-RE: #{payerElement.dataElementCodes[0].code}"
     else payerElement.dataElementCodes[0]
@@ -72,7 +73,7 @@ class Thorax.Models.Patient extends Thorax.Model
     insurances = @get('insurance_providers')?.map (ip) -> ip.name
     insurances?.join(", ") or ''
   getFirstName: ->
-    @get('cqmPatient').givenNames[0]
+    @get('cqmPatient').givenNames?[0]
   getLastName: ->
     @get('cqmPatient').familyName
   getNotes: ->

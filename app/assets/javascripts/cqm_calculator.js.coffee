@@ -32,7 +32,11 @@
 
     # attempt calcuation
     try
-      cqmResults = cqm.execution.Calculator.calculate(cqmMeasure, [cqmPatient.qdmPatient], cqmValueSets, { doPretty: options.doPretty, includeClauseResults: true, requestDocument: false })
+      cqmMeasure.measure_period = {
+        low: {value: new Date},
+        high: {value: new Date}
+      }
+      cqmResults = cqm.execution.Calculator.calculate(cqmMeasure, [cqmPatient], cqmValueSets, { doPretty: options.doPretty, includeClauseResults: true, requestDocument: false })
       patientResults = cqmResults[patient.get('cqmPatient').id.toString()]
 
       measure.get('populations').forEach((measure_population) =>

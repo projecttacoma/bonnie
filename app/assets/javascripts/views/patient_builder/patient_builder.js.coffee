@@ -55,15 +55,15 @@ class Thorax.Views.PatientBuilder extends Thorax.Views.BonnieView
   dataCriteriaCategories: ->
     categories = {}
     @measure?.get('source_data_criteria').each (criteria) ->
-      type = criteria.get('qdmCategory').replace(/_/g, ' ')
+      dataElement = criteria.get('qdmDataElement')
+      type = dataElement.valueSetTitle
       # Filter out negations, certain patient characteristics, and specific occurrences
       # Note: we previously filtered out patient_characteristic_payer, but that was needed on the elements list
       # because a payer can have a start and stop date in QDM 5
-      filter_criteria = criteria.get('negation') or
-      ( ( criteria.get('qdmCategory') is 'patient_characteristic' ) && criteria.get('_type') != 'QDM::PatientCharacteristicPayer')
+      filter_criteria = criteria.get('negation') or type != 'Payer'
       unless filter_criteria
         categories[type] ||= new Thorax.Collection
-        categories[type].add criteria unless categories[type].any (c) -> c.get('description').replace(/,/g , '') == criteria.get('description').replace(/,/g , '') && c.get('code_list_id') == criteria.get('code_list_id')
+        categories[type].add criteria unless categories[type].any (c) -> c.get('description').replace(/,/g , '') == dataElement.get('description').replace(/,/g , '') && c.get('code_list_id') == dataElement.get('codeListId')
     categories = _(categories).omit('transfers','derived')
     # Pass a sorted array to the view so ordering is consistent
     categoriesArray = ({ type: type, criteria: criteria } for type, criteria of categories)
