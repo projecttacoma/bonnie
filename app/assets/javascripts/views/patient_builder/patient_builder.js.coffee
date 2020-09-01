@@ -12,10 +12,13 @@ class Thorax.Views.PatientBuilder extends Thorax.Views.BonnieView
     @cqmMeasure = @measure.get('cqmMeasure')
     @setModel @model.deepClone() # Working on a clone allows cancel to easily drop any changes we make
 #    @model.get('source_data_criteria').on 'remove', => @materialize()
-#    @race_codes = @model.getConceptsForDataElement('race', @measure)
-#    @ethnicity_codes = @model.getConceptsForDataElement('ethnicity', @measure)
-#    @gender_codes = @model.getConceptsForDataElement('gender', @measure)
-#    @payer_codes = @model.getConceptsForDataElement('payer', @measure)
+    # @race_codes = [{code: 'asc', display_name: "blue"},{code: 'asc', display_name: "green"}]
+    # @ethnicity_codes = [{code: 'asc', display_name: "plutonian"},{code: 'asc', display_name: "martian"}]
+    @race_codes = @model.getConceptsForPatientProp('Race', @measure)
+    @ethnicity_codes = @model.getConceptsForPatientProp('Ethnicity', @measure)
+    # @gender_codes = [{code: 'asc', display_name: "dude", value: 'dude'},{code: 'saasc', display_name: "ladie", value: "ladie"}]#@model.getConceptsForDataElement('gender', @measure)
+    @gender_codes = @model.getConceptsForPatientProp("ONC Administrative Sex", @measure)
+    @payer_codes = @model.getConceptsForPatientProp('Payer', @measure)
 #    @first = @model.getFirstName()
 #    @last = @model.getLastName()
 #    @birthdate = @model.getBirthDate()
@@ -122,7 +125,7 @@ class Thorax.Views.PatientBuilder extends Thorax.Views.BonnieView
     serialize: (attr) ->
       @model.setCqmPatientFirstName(attr.first)if attr.first
       @model.setCqmPatientLastName(attr.last) if attr.last
-      @model.setCqmPatientGender(attr.gender, @measure) if attr.gender
+      @model.setFhirPatientGender(attr.gender, @measure) if attr.gender
       birthdate = attr.birthdate if attr.birthdate
       birthdate += " #{attr.birthtime}" if attr.birthdate && attr.birthtime
       @model.setCqmPatientBirthDate(birthdate, @measure) if birthdate

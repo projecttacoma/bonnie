@@ -29,7 +29,7 @@ class Thorax.Models.Patient extends Thorax.Model
     clonedPatient.set 'cqmPatient', cqm.models.CqmPatient.parse(clonedPatient.get('cqmPatient').toJSON())
     # FIXME
 #    if options.new_id then clonedPatient.get('cqmPatient')._id = new mongoose.Types.ObjectId()
-    if options.new_id || !clonedPatient.get('cqmPatient').id then clonedPatient.get('cqmPatient').id = cqm.ObjectID().toHexString()
+    if options.new_id || !clonedPatient.get('cqmPatient').id then clonedPatient.get('cqmPatient').id = 'cqm.ObjectID().toHexString()'
     clonedPatient.set '_id', clonedPatient.get('cqmPatient')?.id
     clonedPatient.set 'source_data_criteria', new Thorax.Collections.SourceDataCriteria(clonedPatient.get('cqmPatient').data_elements, parent: clonedPatient, parse: true)
     clonedPatient.set 'expected_values', new Thorax.Collections.ExpectedValues(clonedPatient.get('cqmPatient').expected_values, parent: clonedPatient, parse: true)
@@ -150,13 +150,18 @@ class Thorax.Models.Patient extends Thorax.Model
       deathdateConcept = @getConceptsForDataElement('expired', measure)[0]
       sourceElement.dataElementCodes[0] = @conceptToCode(deathdateConcept)
     @get('cqmPatient').data_elements.push(sourceElement)
-  setCqmPatientGender: (gender, measure) ->
-    sourceElement = @removeElementAndGetNewCopy('gender', measure.get('cqmMeasure'))
-    if !sourceElement
-      sourceElement = new cqm.models.PatientCharacteristicSex()
-    genderConcept = (@getConceptsForDataElement('gender', measure).filter (elem) -> elem.code == gender)[0]
-    sourceElement.dataElementCodes[0] = @conceptToCode(genderConcept)
-    @get('cqmPatient').data_elements.push(sourceElement)
+
+
+  setFhirPatientGender: (gender, measure) ->
+    # sourceElement = @removeElementAndGetNewCopy('gender', measure.get('cqmMeasure'))
+    currentGender = @get('cqmPatient').fhir_patient.gender
+    if !currentGender
+      currentGender = new cqm.models.AdministrativeGender() # value, id, extension(value, url)
+    genderConcept = (@getConceptsForPatientProp('ONC Administrative Sex', measure).find (elem) -> elem.code == gender)
+    currentGender.dataElementCodes[0] = @conceptToCode(genderConcept)
+    @get('cqmPatient').data_elements.push(currentGender)
+
+
   setCqmPatientRace: (race, measure) ->
     sourceElement = @removeElementAndGetNewCopy('race', measure.get('cqmMeasure'))
     if !sourceElement
@@ -173,17 +178,22 @@ class Thorax.Models.Patient extends Thorax.Model
     @get('cqmPatient').data_elements.push(sourceElement)
 
   removeElementAndGetNewCopy: (elementType, cqmMeasure) ->
-    element = (@get('cqmPatient').patient_characteristics()?.filter (elem) -> elem.qdmStatus == elementType)[0]
-    if element
-      elementIndex = @get('cqmPatient').data_elements.indexOf(element)
-      @attributes.cqmPatient.data_elements.splice(elementIndex, 1)
-    # return copy of dataElement off the measure if one exists
-    sdcDataElement = (cqmMeasure?.source_data_criteria?.filter (elem) -> elem.qdmStatus == elementType )[0]
-    if (sdcDataElement)
-      dataElementType = sdcDataElement._type.replace(/QDM::/, '')
-      return new cqm.models[dataElementType](sdcDataElement.clone())
-    else
-      return null
+    # @get('cqmPatient').fhir_patient[elementType]
+    # element = (@get('cqmPatient').patient_characteristics()?.filter (elem) -> elem.qdmStatus == elementType)[0]
+    # if element
+    #   elementIndex = @get('cqmPatient').data_elements.indexOf(element)
+    #   @attributes.cqmPatient.data_elements.splice(elementIndex, 1)
+    # # return copy of dataElement off the measure if one exists
+    # sdcDataElement = (cqmMeasure?.source_data_criteria?.filter (elem) -> elem.qdmStatus == elementType )[0]
+    # if (sdcDataElement)
+    #   dataElementType = sdcDataElement._type.replace(/QDM::/, '')
+    #   return new cqm.models[dataElementType](sdcDataElement.clone())
+    # else
+    #   return null
+
+  getConceptsForPatientProp: (prop, measure) ->
+    valueSet = measure.valueSets()?.find (elem) -> elem.title == prop
+    valueSet?.compose?.include?[0]?.concept || []
 
   getConceptsForDataElement: (qdmStatus, measure) ->
     return [] unless measure.get('cqmMeasure')?.source_data_criteria?
@@ -243,7 +253,7 @@ class Thorax.Models.Patient extends Thorax.Model
   validate: ->
     errors = []
     birthdate = if @get('cqmPatient').fhir_patient.birthDatetime then moment(@get('cqmPatient').birthDatetime, 'X') else null
-    expiredElement = (@get('cqmPatient').patient_characteristics()?.filter (elem) -> elem.qdmStatus == 'expired')[0]
+    expiredElement = @get('cqmPatient').fhir_patient.deceased
     deathdate = if @get('expired') && expiredElement?.expiredDatetime then moment(expiredElement.expiredDatetime, 'X') else null
 
     unless @getFirstName()?.length > 0
