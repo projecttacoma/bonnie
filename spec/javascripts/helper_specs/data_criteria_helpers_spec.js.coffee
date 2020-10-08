@@ -262,7 +262,7 @@ describe 'DataCriteriaHelpers', ->
       coding.code = cqm.models.PrimitiveCode.parsePrimitive('differential')
       coding.display = cqm.models.PrimitiveString.parsePrimitive('Differential')
       coding.userSelected = cqm.models.PrimitiveBoolean.parsePrimitive(true)
-      # set coding to clinicalStatus
+      # set coding to verificationStatus
       verificationStatus.setValue(conditionResource, coding)
 
       selectedCoding = verificationStatus.getValue(conditionResource)
@@ -275,10 +275,10 @@ describe 'DataCriteriaHelpers', ->
       conditionAttrs = DataCriteriaHelpers.DATA_ELEMENT_ATTRIBUTES['Condition']
       abatement = conditionAttrs[3]
       expect(abatement.path).toEqual 'abatement'
+      # Create DateTime & condition fhir resource
       dateTime = new cqm.models.CQL.DateTime(2020, 10, 5, 8, 0, 0, 0, 0)
-      # Create condition fhir resource and coding
       conditionResource = new cqm.models.Condition()
-      # set coding to clinicalStatus
+      # set abatement DateTime
       abatement.setValue(conditionResource, dateTime)
 
       abatementValue = abatement.getValue(conditionResource)
@@ -290,27 +290,25 @@ describe 'DataCriteriaHelpers', ->
       abatement = conditionAttrs[3]
       expect(abatement.path).toEqual 'abatement'
       str = 'Test abatement'
-      # Create condition fhir resource and coding
+      # Create condition fhir resource
       conditionResource = new cqm.models.Condition()
-      # set coding to clinicalStatus
+      # set abatementString
       abatement.setValue(conditionResource, str)
-
       abatementValue = abatement.getValue(conditionResource)
-      # Verify after setting values
+      # Verify after setting value
       expect(abatementValue.value).toEqual str
 
     it 'should set and get values for abatement if Choice type is Age', ->
       conditionAttrs = DataCriteriaHelpers.DATA_ELEMENT_ATTRIBUTES['Condition']
       abatement = conditionAttrs[3]
       expect(abatement.path).toEqual 'abatement'
-      # Create condition fhir resource and coding
+      # Create condition fhir resource and abatement Age
       conditionResource = new cqm.models.Condition()
       age = new cqm.models.Age()
       age.unit = cqm.models.PrimitiveString.parsePrimitive('days')
       age.value = cqm.models.PrimitiveDecimal.parsePrimitive(12)
-      # set coding to clinicalStatus
+      # set abatement Age
       abatement.setValue(conditionResource, age)
-
       abatementValue = abatement.getValue(conditionResource)
       # Verify after setting values
       expect(abatementValue.unit.value).toEqual age.unit.value
@@ -320,12 +318,12 @@ describe 'DataCriteriaHelpers', ->
       conditionAttrs = DataCriteriaHelpers.DATA_ELEMENT_ATTRIBUTES['Condition']
       abatement = conditionAttrs[3]
       expect(abatement.path).toEqual 'abatement'
-      # Create condition fhir resource and coding
+      # Create condition fhir resource abatement Period
       conditionResource = new cqm.models.Condition()
       period = new cqm.models.Period()
       period.start = cqm.models.PrimitiveDateTime.parsePrimitive('2020-09-02T13:54:57')
       period.end = cqm.models.PrimitiveDateTime.parsePrimitive('2020-10-02T13:54:57')
-      # set coding to clinicalStatus
+      # set abatement Period
       abatement.setValue(conditionResource, period)
 
       abatementValue = abatement.getValue(conditionResource)
