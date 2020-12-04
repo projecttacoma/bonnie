@@ -1,6 +1,5 @@
-[![Build Status](https://travis-ci.com/projecttacoma/bonnie.svg?branch=master)](https://travis-ci.com/projecttacoma/bonnie)
-![GitHub version](https://badge.fury.io/gh/projecttacoma%2Fbonnie.svg)
 
+NOTE: This repository is read-only, and kept for historical purposes. Active development should occur instead on https://github.com/MeasureAuthoringTool/bonnie
 
 
 # Bonnie
